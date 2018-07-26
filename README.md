@@ -5,7 +5,8 @@ ScriptStarter provides a means to generate a pretty template of bash script.
 ## Usage
 
 ```
-bash-4.2# curl -sf https://raw.githubusercontent.com/xshoji/bash-script-starter/v0.1/ScriptStarter.sh |bash -s
+bash-4.2# STARTER_URL=https://raw.githubusercontent.com/xshoji/bash-script-starter/v0.1/ScriptStarter.sh
+bash-4.2# curl -sf ${STARTER_URL} |bash -s
 [!] --naming is required.
 [!] --author is required.
 
@@ -42,7 +43,7 @@ Plain script no needs parameter.
 A `-h` option is supported as default.
 
 ```
-bash-4.2# curl -sf https://raw.githubusercontent.com/xshoji/bash-script-starter/v0.1/ScriptStarter.sh |bash -s - -n MyScript -a xshoji > MyScript
+bash-4.2# curl -sf ${STARTER_URL} |bash -s - -n MyScript -a xshoji > MyScript
 bash-4.2# ./MyScript -h
 
    MyScript
@@ -69,7 +70,7 @@ Missing parameters are displayed as `[!]`.
 
 ```
 bash-4.2#
-bash-4.2# curl -sf https://raw.githubusercontent.com/xshoji/bash-script-starter/v0.1/ScriptStarter.sh |bash -s - -n MyScript -a xshoji -r id,1001 -r name,xshoji > MyScript
+bash-4.2# curl -sf ${STARTER_URL} |bash -s - -n MyScript -a xshoji -r id,1001 -r name,xshoji > MyScript
 bash-4.2# chmod 777 MyScript
 bash-4.2# ./MyScript
 [!] --id is required.
@@ -101,7 +102,7 @@ Optional parameters are not validated.
 These optional parameters are initialized by empty string.
 
 ```
-bash-4.2# curl -sf https://raw.githubusercontent.com/xshoji/bash-script-starter/v0.1/ScriptStarter.sh |bash -s - -n MyScript -a xshoji -o id,1001 -o name,xshoji > MyScript
+bash-4.2# curl -sf ${STARTER_URL} |bash -s - -n MyScript -a xshoji -o id,1001 -o name,xshoji > MyScript
 bash-4.2# chmod 777 MyScript
 bash-4.2# ./MyScript -h
 
@@ -141,7 +142,7 @@ Flags are not validated.
 These flags are set "true" string on enabling (default: empty string).
 
 ```
-bash-4.2# curl -sf https://raw.githubusercontent.com/xshoji/bash-script-starter/v0.1/ScriptStarter.sh |bash -s - -n MyScript -a xshoji -f strict -f dryRun > MyScript
+bash-4.2# curl -sf ${STARTER_URL} |bash -s - -n MyScript -a xshoji -f strict -f dryRun > MyScript
 bash-4.2# ./MyScript -h
 
    MyScript
@@ -180,7 +181,7 @@ You can check environment variables be should exported.
 Missing environment variables are displayed as `[!]`.
 
 ```
-bash-4.2# curl -sf https://raw.githubusercontent.com/xshoji/bash-script-starter/v0.1/ScriptStarter.sh |bash -s - -n MyScript -a xshoji -e ENV_VAR_A,1001 -e ENV_VAR_B,xshoji > MyScript
+bash-4.2# curl -sf ${STARTER_URL} |bash -s - -n MyScript -a xshoji -e ENV_VAR_A,1001 -e ENV_VAR_B,xshoji > MyScript
 bash-4.2# ./MyScript
 [!] export ENV_VAR_A=1001 is required.
 [!] export ENV_VAR_B=xshoji is required.
@@ -218,7 +219,7 @@ You can specify each parameters as short name parameter.
 `-s` option enables short parameter.
 
 ```
-bash-4.2# curl -sf https://raw.githubusercontent.com/xshoji/bash-script-starter/v0.1/ScriptStarter.sh |bash -s - -n MyScript -a xshoji -r id,1001 -o name,xshoji -f dryRun -s > MyScript
+bash-4.2# curl -sf ${STARTER_URL} |bash -s - -n MyScript -a xshoji -r id,1001 -o name,xshoji -f dryRun -s > MyScript
 bash-4.2# ./MyScript
 [!] --id is required.
 
