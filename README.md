@@ -138,7 +138,7 @@ bash-4.2#
 
 Flags are not validated.
 
-These flags are set "true" string on enabling.
+These flags are set "true" string on enabling (default: empty string).
 
 ```
 bash-4.2# curl -sf https://raw.githubusercontent.com/xshoji/bash-script-starter/v0.1/ScriptStarter.sh |bash -s - -n MyScript -a xshoji -f strict -f dryRun > MyScript
