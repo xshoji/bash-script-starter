@@ -35,7 +35,7 @@ bash-4.2#
 
 ## Generate script
 
-#### Plain
+### Plain
 
 Plain script no needs parameter.
 
@@ -61,7 +61,7 @@ bash-4.2# ./MyScript
 bash-4.2#
 ```
 
-#### Required parameters
+### Required parameters
 
 Required parameters are validated.
 
@@ -94,7 +94,7 @@ bash-4.2# ./MyScript
 bash-4.2#
 ```
 
-#### Optional parameters
+### Optional parameters
 
 Optional parameters are not validated.
 
@@ -134,7 +134,7 @@ name:
 bash-4.2#
 ```
 
-#### Flags
+### Flags
 
 Flags are not validated.
 
@@ -173,7 +173,7 @@ dryRun: true
 bash-4.2#
 ```
 
-#### Environment variables
+### Environment variables
 
 You can check environment variables be should exported.
 
@@ -211,7 +211,7 @@ ENV_VAR_B: xshoji
 bash-4.2#
 ```
 
-#### Support short name parameters
+### Support short name parameters
 
 You can specify each parameters as short name parameter.
 
