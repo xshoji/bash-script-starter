@@ -63,7 +63,7 @@ echo ${COUNT}". ok"
 COUNT=$(( COUNT + 1 ))
 ./${SCRIPT_PATH} --naming test --author user > ${TEST_FILE}
 chmod 777 ${TEST_FILE}
-bash ${TEST_FILE}
+${TEST_FILE}
 
 echo ""
 echo "================="
@@ -71,8 +71,8 @@ echo ${COUNT}". execute generated tool"
 COUNT=$(( COUNT + 1 ))
 ./${SCRIPT_PATH} --naming test --author user --required aaa,aaa > ${TEST_FILE}
 chmod 777 ${TEST_FILE}
-bash ${TEST_FILE}
-bash ${TEST_FILE} --aaa aaa
+${TEST_FILE}
+${TEST_FILE} --aaa aaa
 
 echo ""
 echo "================="
@@ -80,10 +80,10 @@ echo ${COUNT}". execute generated tool with env"
 COUNT=$(( COUNT + 1 ))
 ./${SCRIPT_PATH} --naming test --author user --required aaa,aaa --env TEST,test > ${TEST_FILE}
 chmod 777 ${TEST_FILE}
-bash ${TEST_FILE}
-bash ${TEST_FILE} --aaa aaa
+${TEST_FILE}
+${TEST_FILE} --aaa aaa
 export TEST=test
-bash ${TEST_FILE} --aaa aaa
+${TEST_FILE} --aaa aaa
 unset TEST
 
 echo ""
@@ -92,9 +92,9 @@ echo ${COUNT}". execute generated tool with option"
 COUNT=$(( COUNT + 1 ))
 ./${SCRIPT_PATH} --naming test --author user --required aaa,aaa --option bbb,bbb > ${TEST_FILE}
 chmod 777 ${TEST_FILE}
-bash ${TEST_FILE}
-bash ${TEST_FILE} --aaa aaa
-bash ${TEST_FILE} --aaa aaa --bbb bbb
+${TEST_FILE}
+${TEST_FILE} --aaa aaa
+${TEST_FILE} --aaa aaa --bbb bbb
 
 echo ""
 echo "================="
@@ -102,10 +102,10 @@ echo ${COUNT}". execute generated tool with option and flag"
 COUNT=$(( COUNT + 1 ))
 ./${SCRIPT_PATH} --naming test --author user --required aaa,aaa --option bbb,bbb --flag ccc > ${TEST_FILE}
 chmod 777 ${TEST_FILE}
-bash ${TEST_FILE}
-bash ${TEST_FILE} --aaa aaa
-bash ${TEST_FILE} --aaa aaa --bbb bbb
-bash ${TEST_FILE} --aaa aaa --bbb bbb --ccc
+${TEST_FILE}
+${TEST_FILE} --aaa aaa
+${TEST_FILE} --aaa aaa --bbb bbb
+${TEST_FILE} --aaa aaa --bbb bbb --ccc
 
 echo ""
 echo "================="
@@ -113,9 +113,9 @@ echo ${COUNT}". execute generated tool without required parameter"
 COUNT=$(( COUNT + 1 ))
 ./${SCRIPT_PATH} --naming test --author user --option bbb,bbb --flag ccc > ${TEST_FILE}
 chmod 777 ${TEST_FILE}
-bash ${TEST_FILE}
-bash ${TEST_FILE} --bbb bbb
-bash ${TEST_FILE} --bbb bbb --ccc
+${TEST_FILE}
+${TEST_FILE} --bbb bbb
+${TEST_FILE} --bbb bbb --ccc
 
 echo ""
 echo "================="
@@ -123,12 +123,12 @@ echo ${COUNT}". execute generated tool strange order parameters"
 COUNT=$(( COUNT + 1 ))
 ./${SCRIPT_PATH} --xxx --flag ccc --yyy --option bbb,bbb --required xxx,xxx --naming test --author user > ${TEST_FILE}
 chmod 777 ${TEST_FILE}
-bash ${TEST_FILE}
-bash ${TEST_FILE} --xxx xxx
-bash ${TEST_FILE} --bbb bbb --xxx xxx
-bash ${TEST_FILE} --bbb bbb --ccc --xxx xxx
-bash ${TEST_FILE} --debug 
-bash ${TEST_FILE} --debug --xxx xxx
+${TEST_FILE}
+${TEST_FILE} --xxx xxx
+${TEST_FILE} --bbb bbb --xxx xxx
+${TEST_FILE} --bbb bbb --ccc --xxx xxx
+${TEST_FILE} --debug 
+${TEST_FILE} --debug --xxx xxx
 
 echo ""
 echo "================="
@@ -136,12 +136,12 @@ echo ${COUNT}". execute generated tool strange order parameters shorten"
 COUNT=$(( COUNT + 1 ))
 ./${SCRIPT_PATH} --xxx -f ccc --yyy -o bbb,bbb -r xxx,xxx -n test -a user > ${TEST_FILE}
 chmod 777 ${TEST_FILE}
-bash ${TEST_FILE}
-bash ${TEST_FILE} --xxx xxx
-bash ${TEST_FILE} --bbb bbb --xxx xxx
-bash ${TEST_FILE} --bbb bbb --ccc --xxx xxx
-bash ${TEST_FILE} --debug 
-bash ${TEST_FILE} --debug --xxx xxx
+${TEST_FILE}
+${TEST_FILE} --xxx xxx
+${TEST_FILE} --bbb bbb --xxx xxx
+${TEST_FILE} --bbb bbb --ccc --xxx xxx
+${TEST_FILE} --debug 
+${TEST_FILE} --debug --xxx xxx
 
 echo ""
 echo "================="
@@ -149,12 +149,12 @@ echo ${COUNT}". execute generated tool strange order parameters shorten"
 COUNT=$(( COUNT + 1 ))
 ./${SCRIPT_PATH} --xxx -f ccc --yyy -o bbb,bbb -r xxx,xxx -n test -a user -s > ${TEST_FILE}
 chmod 777 ${TEST_FILE}
-bash ${TEST_FILE}
-bash ${TEST_FILE} --xxx xxx
-bash ${TEST_FILE} -b bbb -x xxx
-bash ${TEST_FILE} -b bbb -c -x x
-bash ${TEST_FILE} --debug
-bash ${TEST_FILE} --debug -x xxx
+${TEST_FILE}
+${TEST_FILE} --xxx xxx
+${TEST_FILE} -b bbb -x xxx
+${TEST_FILE} -b bbb -c -x x
+${TEST_FILE} --debug
+${TEST_FILE} --debug -x xxx
 
 echo ""
 echo "================="
@@ -162,11 +162,13 @@ echo ${COUNT}". execute generated tool strange order parameters shorten with des
 COUNT=$(( COUNT + 1 ))
 ./${SCRIPT_PATH} --xxx -f ccc --yyy -o bbb,bbb -r xxx,xxx -n test -a user -s -d "Test script" > ${TEST_FILE}
 chmod 777 ${TEST_FILE}
-bash ${TEST_FILE}
-bash ${TEST_FILE} --xxx xxx
-bash ${TEST_FILE} -b bbb -x xxx
-bash ${TEST_FILE} -b bbb -c -x x
-bash ${TEST_FILE} --debug
-bash ${TEST_FILE} --debug -x xxx
+${TEST_FILE}
+${TEST_FILE} --xxx xxx
+${TEST_FILE} -b bbb -x xxx
+${TEST_FILE} -b bbb -c -x x
+${TEST_FILE} --debug
+${TEST_FILE} --debug -x xxx
+${TEST_FILE} -x xxx -h
+${TEST_FILE} -x xxx --help
 
-rm -rf ${TEST_FILE} 
+# rm -rf ${TEST_FILE} 

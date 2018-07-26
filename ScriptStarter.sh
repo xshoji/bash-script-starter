@@ -10,7 +10,7 @@ cat << "_EOT_"
 _EOT_
 cat << _EOT_
   Usage:
-    ./$(basename "$0") --naming scriptName --author name [ --required paramName,sample --require ... --option paramName,sample --option ... --flag flagName --flag ... --env varName,sample --env ... ]
+    ./$(basename "$0") --naming scriptName --author name [ --description "ScriptStarter's description here." --required paramName,sample --require ... --option paramName,sample --option ... --flag flagName --flag ... --env varName,sample --env ... --short]
 
   Description:
     This script generates a template of bash script tool.
@@ -20,11 +20,11 @@ cat << _EOT_
     --author,-a authorName : Script author.
 
   Optional parameters:
+    --description,-d "Description" : Description of this script. [ example: --description "ScriptStarter's description here." ]
     --required,-r paramName,sample : Required parameter setting. [ example: --required id,1001 ]
-    --option,-o paramName,sample   : Optional parameter setting. [ example: --option name,John ]
+    --option,-o paramName,sample   : Optional parameter setting. [ example: --option name,xshoji ]
     --flag,-f paramName            : Optional flag parameter setting. [ example: --flag dryRun ]
     --env,-e varName,sample        : Required environment variable. [ example: --env API_HOST,example.com ]
-    --description,-d "Description" : Description of this script. [ example: --description "This is my script." ]
     --short,-s                     : Enable short parameter. [ example: --short ]
 
 _EOT_
@@ -385,6 +385,7 @@ for ARG in "$@"
 do
     SHIFT="true"
     [ "${ARG}" == "--debug" ] && { shift 1; set -eux; SHIFT="false"; }
+    ([ "${ARG}" == "--help" ] || [ "${ARG}" == "-h" ]) && { shift 1; IS_HELP="true"; SHIFT="false"; }
 __EOT__
 
 printParseArgument ${ARGS_REQUIRED[@]+"${ARGS_REQUIRED[@]}"}
@@ -400,8 +401,9 @@ __EOT__
 [ ${#ARGS_REQUIRED[@]} -gt 0 ] && { echo "# Check required parameters"; }
 printCheckRequiredArgument ${ARGS_REQUIRED[@]+"${ARGS_REQUIRED[@]}"}
 echo '[ ! -z "${INVALID_STATE+x}" ] && { usage; exit 1; }'
+echo '[ ! -z "${IS_HELP+x}" ] && { usage; exit 0; }'
 if [ ${#ARGS_OPTIONAL[@]} -gt 0 ] || [ ${#ARGS_FLAG[@]} -gt 0 ]; then
-    echo "# Set default"
+    echo "# Initialize optional variables"
 fi
 printSetDefaultArgument ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"}
 printSetDefaultArgument ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
