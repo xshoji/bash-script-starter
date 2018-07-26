@@ -43,7 +43,6 @@ A `-h` option is supported as default.
 
 ```
 bash-4.2# curl -sf https://raw.githubusercontent.com/xshoji/bash-script-starter/v0.1/ScriptStarter.sh |bash -s - -n MyScript -a xshoji > MyScript
-bash-4.2# chmod 777 MyScript
 bash-4.2# ./MyScript -h
 
    MyScript
@@ -58,10 +57,11 @@ bash-4.2# ./MyScript -h
   Optional parameters:
     --debug : Enable debug mode
 
+bash-4.2# ./MyScript
 bash-4.2#
 ```
 
-#### Required arguments
+#### Required parameters
 
 Required parameters are validated.
 
@@ -94,7 +94,7 @@ bash-4.2# ./MyScript
 bash-4.2#
 ```
 
-#### Optional arguments
+#### Optional parameters
 
 Optional parameters are not validated.
 
@@ -134,7 +134,7 @@ name:
 bash-4.2#
 ```
 
-#### Flag
+#### Flags
 
 Flags are not validated.
 
@@ -173,7 +173,7 @@ dryRun: true
 bash-4.2#
 ```
 
-#### Environment variable
+#### Environment variables
 
 You can check environment variables be should exported.
 
@@ -211,9 +211,9 @@ ENV_VAR_B: xshoji
 bash-4.2#
 ```
 
-#### Support short parameters
+#### Support short name parameters
 
-You can specify each parameters as short parameter name.
+You can specify each parameters as short name parameter.
 
 `-s` option enables short parameter.
 
