@@ -7,7 +7,7 @@ ScriptStarter provides a means to generate a pretty template of bash script.
 Set ScriptStarter url.
 
 ```
-bash-4.2# STARTER_URL=https://raw.githubusercontent.com/xshoji/bash-script-starter/v0.1/ScriptStarter.sh
+bash-4.2# STARTER_URL=https://raw.githubusercontent.com/xshoji/bash-script-starter/master/ScriptStarter.sh
 ```
 
 Display usage.
