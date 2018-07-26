@@ -171,4 +171,4 @@ ${TEST_FILE} --debug -x xxx
 ${TEST_FILE} -x xxx -h
 ${TEST_FILE} -x xxx --help
 
-# rm -rf ${TEST_FILE} 
+rm -rf ${TEST_FILE} 
