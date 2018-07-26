@@ -261,7 +261,7 @@ function printCheckRequiredArgument() {
     done
 }
 
-function printSetDefaultArgument() {
+function printSetInitialValue() {
     for ARG in "$@"
     do
         local PARAM_NAME=$(cut -d',' -f 1 <<<${1})
@@ -405,8 +405,8 @@ echo '[ ! -z "${IS_HELP+x}" ] && { usage; exit 0; }'
 if [ ${#ARGS_OPTIONAL[@]} -gt 0 ] || [ ${#ARGS_FLAG[@]} -gt 0 ]; then
     echo "# Initialize optional variables"
 fi
-printSetDefaultArgument ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"}
-printSetDefaultArgument ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
+printSetInitialValue ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"}
+printSetInitialValue ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
 
 cat << __EOT__
 
