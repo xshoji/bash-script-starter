@@ -98,9 +98,9 @@ ${TEST_FILE} --aaa aaa --bbb bbb
 
 echo ""
 echo "================="
-echo ${COUNT}". execute generated tool with option and flag"
+echo ${COUNT}". execute generated tool with option and flag with desciprtion"
 COUNT=$(( COUNT + 1 ))
-./${SCRIPT_PATH} --naming test --author user --required aaa,aaa --option bbb,bbb --flag ccc > ${TEST_FILE}
+./${SCRIPT_PATH} --naming test --author user --required aaa,aaa,"aaa param is here." --option bbb,bbb,"bbb param is here." --flag ccc,"ccc flag is here." > ${TEST_FILE}
 chmod 777 ${TEST_FILE}
 ${TEST_FILE}
 ${TEST_FILE} --aaa aaa
