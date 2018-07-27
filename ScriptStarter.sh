@@ -23,7 +23,7 @@ cat << _EOT_
     --description,-d "Description"             : Description of this script. [ example: --description "ScriptStarter's description here." ]
     --required,-r paramName,sample,description : Required parameter setting. [ example: --required id,1001,"Primary id here." ]
     --option,-o paramName,sample,description   : Optional parameter setting. [ example: --option name,xshoji,"User name here." ]
-    --flag,-f paramName,description            : Optional flag parameter setting. [ example: --flag dryRun,"Dry run mode." ]
+    --flag,-f flagName,description             : Optional flag parameter setting. [ example: --flag dryRun,"Dry run mode." ]
     --env,-e varName,sample                    : Required environment variable. [ example: --env API_HOST,example.com ]
     --short,-s                                 : Enable short parameter. [ example: --short ]
 
@@ -160,6 +160,7 @@ function printEnvironmentVariableDescription() {
 function printParameterDescription() {
     for ARG in "$@"
     do
+        # - [csv - Printing column separated by comma using Awk command line - Stack Overflow](https://stackoverflow.com/questions/26842504/printing-column-separated-by-comma-using-awk-command-line)
         local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
         local SAMPLE=$(awk -F',' '{print $2}' <<<${1})
         local DESCRIPTION=$(awk -F',' '{print $3}' <<<${1})
