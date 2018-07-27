@@ -406,8 +406,8 @@ __EOT__
 
 [ ${#ARGS_REQUIRED[@]} -gt 0 ] && { echo "# Check required parameters"; }
 printCheckRequiredArgument ${ARGS_REQUIRED[@]+"${ARGS_REQUIRED[@]}"}
-echo '[ ! -z "${INVALID_STATE+x}" ] && { usage; exit 1; }'
 echo '[ ! -z "${IS_HELP+x}" ] && { usage; exit 0; }'
+echo '[ ! -z "${INVALID_STATE+x}" ] && { usage; exit 1; }'
 if [ ${#ARGS_OPTIONAL[@]} -gt 0 ] || [ ${#ARGS_FLAG[@]} -gt 0 ]; then
     echo "# Initialize optional variables"
 fi
