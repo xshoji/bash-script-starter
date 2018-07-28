@@ -44,6 +44,7 @@ ARGS_OPTIONAL=()
 ARGS_FLAG=()
 ARGS_ENVIRONMENT=()
 ARGS_SHORT=()
+ARGS_DESCRIPTION=()
 
 for ARG in "$@"
 do
@@ -56,7 +57,7 @@ do
     ([ "${ARG}" == "--flag" ]        || [ "${ARG}" == "-f" ]) && { shift 1; ARGS_FLAG+=("${1}"); SHIFT="false"; }
     ([ "${ARG}" == "--env" ]         || [ "${ARG}" == "-e" ]) && { shift 1; ARGS_ENVIRONMENT+=("${1}"); SHIFT="false"; }
     ([ "${ARG}" == "--short" ]       || [ "${ARG}" == "-s" ]) && { shift 1; SHORT="true"; SHIFT="false"; }
-    ([ "${ARG}" == "--description" ] || [ "${ARG}" == "-d" ]) && { shift 1; DESCRIPTION=${1}; SHIFT="false"; }
+    ([ "${ARG}" == "--description" ] || [ "${ARG}" == "-d" ]) && { shift 1; ARGS_DESCRIPTION+=("${1}"); SHIFT="false"; }
     ([ "${SHIFT}" == "true" ] && [ "$#" -gt 0 ]) && { shift 1; }
 done
 # Check require parameters
@@ -131,17 +132,21 @@ function printUsageExecutionExampleFlag() {
 
 
 function printScriptDescription() {
-    if [ "${DESCRIPTION}" == "" ]; then
-        local PRINTED_DESCRIPTION="This is ${SCRIPT_NAME}"
-    else
-        local PRINTED_DESCRIPTION="${DESCRIPTION}"
-    fi
 cat << __EOT__
- 
+
   Description:
-    ${PRINTED_DESCRIPTION}
- 
 __EOT__
+    local PRINTED_DESCRIPTIONS=()
+    if [ ${#ARGS_DESCRIPTION[@]} -gt 0 ]; then
+        PRINTED_DESCRIPTIONS=("${ARGS_DESCRIPTION[@]}")
+    else
+        PRINTED_DESCRIPTIONS+=("This is ${SCRIPT_NAME}")
+    fi
+    for PRINTED_DESCRIPTION in "${PRINTED_DESCRIPTIONS[@]}"
+    do
+        echo "    ${PRINTED_DESCRIPTION}"
+    done
+    echo ""
 }
 
 
@@ -347,7 +352,7 @@ echo ""
 
 
 # Print script description
-printScriptDescription ${SCRIPT_NAME}
+printScriptDescription
 
 
 
