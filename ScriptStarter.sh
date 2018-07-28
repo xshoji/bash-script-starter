@@ -375,8 +375,6 @@ echo ""
 printUsageFunctionBottomPart
 
 
-[ ${#ARGS_ENVIRONMENT[@]} -gt 0 ] && { echo "# Check environment variables"; }
-printCheckRequiredEnvironmentVariable ${ARGS_ENVIRONMENT[@]+"${ARGS_ENVIRONMENT[@]}"}
 cat << "__EOT__"
 
 
@@ -391,7 +389,7 @@ for ARG in "$@"
 do
     SHIFT="true"
     [ "${ARG}" == "--debug" ] && { shift 1; set -eux; SHIFT="false"; }
-    ([ "${ARG}" == "--help" ] || [ "${ARG}" == "-h" ]) && { shift 1; IS_HELP="true"; SHIFT="false"; }
+    ([ "${ARG}" == "--help" ] || [ "${ARG}" == "-h" ]) && { shift 1; HELP="true"; SHIFT="false"; }
 __EOT__
 
 printParseArgument ${ARGS_REQUIRED[@]+"${ARGS_REQUIRED[@]}"}
@@ -403,11 +401,18 @@ cat << "__EOT__"
 done
 __EOT__
 
+# Help mode
+echo '[ ! -z "${HELP+x}" ] && { usage; exit 0; }'
 
+[ ${#ARGS_ENVIRONMENT[@]} -gt 0 ] && { echo "# Check environment variables"; }
+printCheckRequiredEnvironmentVariable ${ARGS_ENVIRONMENT[@]+"${ARGS_ENVIRONMENT[@]}"}
 [ ${#ARGS_REQUIRED[@]} -gt 0 ] && { echo "# Check required parameters"; }
 printCheckRequiredArgument ${ARGS_REQUIRED[@]+"${ARGS_REQUIRED[@]}"}
+
+# Check invalid state
+echo "# Check invalid state and display usage"
 echo '[ ! -z "${INVALID_STATE+x}" ] && { usage; exit 1; }'
-echo '[ ! -z "${IS_HELP+x}" ] && { usage; exit 0; }'
+
 if [ ${#ARGS_OPTIONAL[@]} -gt 0 ] || [ ${#ARGS_FLAG[@]} -gt 0 ]; then
     echo "# Initialize optional variables"
 fi

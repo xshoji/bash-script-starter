@@ -258,3 +258,10 @@ dryRun: true
 
 bash-4.2#
 ```
+
+## How to use the generated script?
+
+Your script should be writen following "Main".
+
+If you would like to alter script parameters, you re-generate a script template by ScriptStarter.
+Then, lines from top to "Main" on generated template only have to be copied and pasted to your script.
