@@ -160,7 +160,7 @@ echo ""
 echo "================="
 echo ${COUNT}". execute generated tool strange order parameters shorten with description"
 COUNT=$(( COUNT + 1 ))
-./${SCRIPT_PATH} --xxx -f ccc --yyy -o bbb,bbb -r xxx,xxx -n test -a user -s -d "Test script" > ${TEST_FILE}
+./${SCRIPT_PATH} --xxx -f ccc --yyy -o bbb,bbb -r xxx,xxx -n test -a user -s -d "Test script" -d "Second description" -d "Third description" > ${TEST_FILE}
 chmod 777 ${TEST_FILE}
 ${TEST_FILE}
 ${TEST_FILE} --xxx xxx
