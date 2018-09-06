@@ -158,6 +158,15 @@ function printFunctionTopPart() {
     echo "function ${1}() {"
 }
 
+function printLocalDeclarationArgument() {
+    for ARG in "$@"
+    do
+        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
+        local VAR_NAME=$(echo ${PARAM_NAME} | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
+        echo '    local '${VAR_NAME}='""'
+        shift 1
+    done
+}
 
 function printParseArgument() {
     for ARG in "$@"
@@ -165,13 +174,13 @@ function printParseArgument() {
         local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
         local PARAM_NAME_SHORT=$(cut -c 1 <<<${1})
         local VAR_NAME=$(echo ${PARAM_NAME} | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
-        local CONDITION='[ "${ARG}" == "--'"${PARAM_NAME}"'" ]'
+        local CONDITION='[ "${_ARG}" == "--'"${PARAM_NAME}"'" ]'
         local IS_USED_SHORT_PARAM=$(grep "1${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
         if [ "${SHORT}" == "true" ] && [ "${IS_USED_SHORT_PARAM}" == "" ]; then
             ARGS_SHORT+=("1${PARAM_NAME_SHORT}")
-            CONDITION='('"${CONDITION}"' || [ "${ARG}" == "-'"${PARAM_NAME_SHORT}"'" ])'
+            CONDITION='('"${CONDITION}"' || [ "${_ARG}" == "-'"${PARAM_NAME_SHORT}"'" ])'
         fi
-        echo '        '"${CONDITION}"' && { shift 1; local '"${VAR_NAME}"'="${1}"; SHIFT="false"; }'
+        echo '        '"${CONDITION}"' && { shift 1; '"${VAR_NAME}"'="${1}"; _SHIFT="false"; }'
         shift 1
     done
 }
@@ -183,13 +192,13 @@ function printParseArgumentFlag() {
         local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
         local PARAM_NAME_SHORT=$(cut -c 1 <<<${1})
         local VAR_NAME=$(echo ${PARAM_NAME} | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
-        local CONDITION='[ "${ARG}" == "--'"${PARAM_NAME}"'" ]'
+        local CONDITION='[ "${_ARG}" == "--'"${PARAM_NAME}"'" ]'
         local IS_USED_SHORT_PARAM=$(grep "1${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
         if [ "${SHORT}" == "true" ] && [ "${IS_USED_SHORT_PARAM}" == "" ]; then
             ARGS_SHORT+=("1${PARAM_NAME_SHORT}")
-            CONDITION='('"${CONDITION}"' || [ "${ARG}" == "-'"${PARAM_NAME_SHORT}"'" ])'
+            CONDITION='('"${CONDITION}"' || [ "${_ARG}" == "-'"${PARAM_NAME_SHORT}"'" ])'
         fi
-        echo '        '"${CONDITION}"' && { shift 1; local '"${VAR_NAME}"'="true"; SHIFT="false"; }'
+        echo '        '"${CONDITION}"' && { shift 1; '"${VAR_NAME}"'="true"; _SHIFT="false"; }'
         shift 1
     done
 }
@@ -201,55 +210,32 @@ function printCheckRequiredArgument() {
     do
         local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
         local VAR_NAME=$(echo ${PARAM_NAME} | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
-        echo '[ -z "${'"${VAR_NAME}"'+x}" ] && { echo "[!] '${FUNCTION_NAME}'() requires --'"${PARAM_NAME}"' "; local INVALID_STATE="true"; }'
+        echo '    [ "${'"${VAR_NAME}"'}" == "" ] && { echo "[!] '${FUNCTION_NAME}'() requires --'"${PARAM_NAME}"' "; _INVALID_STATE="true"; }'
         shift 1
     done
-}
-
-function printSetInitialValue() {
-    for ARG in "$@"
-    do
-        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
-        local VAR_NAME=$(echo ${PARAM_NAME} | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
-        echo '[ -z "${'"${VAR_NAME}"'+x}" ] && { local '"${VAR_NAME}"=\"\"'; }'
-        shift 1
-    done
-}
-
-function printVariableEnvironment() {
-    echo 'echo "[ Environment variables ]"'
-    for ARG in "$@"
-    do
-        local VAR_NAME=$(awk -F',' '{print $1}' <<<${1})
-        echo 'echo "'"${VAR_NAME}"': ${'"${VAR_NAME}"'}"'
-        shift 1
-    done
-    echo 'echo ""'
 }
 
 
 function printVariableRequired() {
-    echo 'echo "[ Required parameters ]"'
+    echo '    echo "  Required arguments"'
     for ARG in "$@"
     do
         local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
         local VAR_NAME=$(echo ${PARAM_NAME} | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
-        echo 'echo "'"${PARAM_NAME}"': ${'"${VAR_NAME}"'}"'
+        echo '    echo "    - '"${PARAM_NAME}"': ${'"${VAR_NAME}"'}"'
         shift 1
     done
-    echo 'echo ""'
 }
 
 function printVariableOptional() {
-    echo 'echo "[ Optional parameters ]"'
+    echo '    echo "  Optional arguments"'
     for ARG in "$@"
     do
         local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
         local VAR_NAME=$(echo ${PARAM_NAME} | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
-        echo 'echo "'"${PARAM_NAME}"': ${'"${VAR_NAME}"'}"'
+        echo '    echo "    - '"${PARAM_NAME}"': ${'"${VAR_NAME}"'}"'
         shift 1
     done
-    echo 'echo ""'
 }
 
 
@@ -293,7 +279,6 @@ if [ ${#ARGS_OPTIONAL[@]} -gt 0 ] || [ ${#ARGS_FLAG[@]} -gt 0 ]; then
     printParameterDescription ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"}
     printParameterDescriptionFlag ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
 fi
-echo "#   --debug : Enable debug mode"
 
 printUsageFunctionBottomPart
 
@@ -303,19 +288,17 @@ printFunctionTopPart ${FUNCTION_NAME}
 
 cat << "__EOT__"
     # Argument parsing
-    set -eu
-    local ARG=""
-    local SHIFT=""
-    local INVALID_STATE=""
+    local _ARG=""; local _SHIFT=""; local _INVALID_STATE=""
 __EOT__
 
-
+printLocalDeclarationArgument ${ARGS_REQUIRED[@]+"${ARGS_REQUIRED[@]}"}
+printLocalDeclarationArgument ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"}
+printLocalDeclarationArgument ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
 
 cat << "__EOT__"
-    for ARG in "$@"
+    for _ARG in "$@"
     do
-        local SHIFT="true"
-        [ "${ARG}" == "--debug" ] && { shift 1; set -eux; SHIFT="false"; }
+        local _SHIFT="true"
 __EOT__
 
 printParseArgument ${ARGS_REQUIRED[@]+"${ARGS_REQUIRED[@]}"}
@@ -323,37 +306,24 @@ printParseArgument ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"}
 printParseArgumentFlag ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
 
 cat << "__EOT__"
-        ([ "${SHIFT}" == "true" ] && [ "$#" -gt 0 ]) && { shift 1; }
+        ([ "${_SHIFT}" == "true" ] && [ "$#" -gt 0 ]) && { shift 1; }
     done
 __EOT__
 
-[ ${#ARGS_REQUIRED[@]} -gt 0 ] && { echo "# Check required parameters"; }
+[ ${#ARGS_REQUIRED[@]} -gt 0 ] && { echo "    # Check required arguments"; }
 printCheckRequiredArgument ${ARGS_REQUIRED[@]+"${ARGS_REQUIRED[@]}"}
 
 # Check invalid state
-echo "# Check invalid state and display usage"
-echo '[ "${INVALID_STATE}" == "true" ] && { usage; exit 1; }'
-
-if [ ${#ARGS_OPTIONAL[@]} -gt 0 ] || [ ${#ARGS_FLAG[@]} -gt 0 ]; then
-    echo "# Initialize optional variables"
-fi
-printSetInitialValue ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"}
-printSetInitialValue ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
-
-cat << __EOT__
-
-
-
-#------------------------------------------
-# Main
-#------------------------------------------
-
-
-__EOT__
+echo "    # Check invalid state"
+echo '    [ "${_INVALID_STATE}" == "true" ] && { exit 1; }'
+echo "    "
+echo "    # Main"
 
 
 if [ ${#ARGS_REQUIRED[@]} -gt 0 ] || [ ${#ARGS_OPTIONAL[@]} -gt 0 ] || [ ${#ARGS_FLAG[@]} -gt 0 ]; then
-    echo 'echo ""'
+    echo '    echo ""'
+    echo '    echo "'${FUNCTION_NAME}'()"'
+    REQUIRED_EOT="true"
 fi
 
 if [ ${#ARGS_REQUIRED[@]} -gt 0 ]; then
@@ -362,3 +332,7 @@ fi
 if [ ${#ARGS_OPTIONAL[@]} -gt 0 ] || [ ${#ARGS_FLAG[@]} -gt 0 ]; then
     printVariableOptional ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"} ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
 fi
+
+[ ! -z "${REQUIRED_EOT+x}" ] && { echo '    echo ""'; }
+
+echo "}"
