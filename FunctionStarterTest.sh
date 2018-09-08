@@ -48,6 +48,9 @@ done
 # Main
 #------------------------------------------
 COUNT=1
+TEST_FILE=/tmp/test.sh
+FUNCTION_NAME="getUserData"
+#trap "rm -rf ${TEST_FILE}" EXIT
 
 echo ""
 echo "================="
@@ -59,64 +62,99 @@ echo ""
 echo "================="
 echo ${COUNT}". ok"
 COUNT=$(( COUNT + 1 ))
-bash ${SCRIPT_PATH} -n getUserData
+bash ${SCRIPT_PATH} -n ${FUNCTION_NAME} |tee ${TEST_FILE}
+echo ${FUNCTION_NAME} >> ${TEST_FILE}
+sh ${TEST_FILE}
 
 echo ""
 echo "================="
 echo ${COUNT}". ok with description one line"
 COUNT=$(( COUNT + 1 ))
-bash ${SCRIPT_PATH} -n getUserData -d "A function description."
+bash ${SCRIPT_PATH} -n ${FUNCTION_NAME} -d "A function description." |tee ${TEST_FILE}
+echo ${FUNCTION_NAME} >> ${TEST_FILE}
+sh ${TEST_FILE}
 
 echo ""
 echo "================="
 echo ${COUNT}". ok with description multiple lines"
 COUNT=$(( COUNT + 1 ))
-bash ${SCRIPT_PATH} -n getUserData -d "A function description." -d "line 2." -d "line 3."
+bash ${SCRIPT_PATH} -n ${FUNCTION_NAME} -d "A function description." -d "line 2." -d "line 3." |tee ${TEST_FILE}
+echo ${FUNCTION_NAME} >> ${TEST_FILE}
+sh ${TEST_FILE}
 
 echo ""
 echo "================="
 echo ${COUNT}". one required argument"
 COUNT=$(( COUNT + 1 ))
-bash ${SCRIPT_PATH} -n getUserData -r name,Taro,"A user name"
+bash ${SCRIPT_PATH} -n ${FUNCTION_NAME} -r name,Taro,"A user name" |tee ${TEST_FILE}
+echo ${FUNCTION_NAME} >> ${TEST_FILE}
+sh ${TEST_FILE}
+sed -i '' "s/^${FUNCTION_NAME}/${FUNCTION_NAME} --name Taro/g" ${TEST_FILE}
+sh ${TEST_FILE}
 
 echo ""
 echo "================="
 echo ${COUNT}". multiple required arguments"
 COUNT=$(( COUNT + 1 ))
-bash ${SCRIPT_PATH} -n getUserData -r name,Taro,"A user name" -r country,Japan,"A country"
+bash ${SCRIPT_PATH} -n ${FUNCTION_NAME} -r name,Taro,"A user name" -r country,Japan,"A country" |tee ${TEST_FILE}
+echo ${FUNCTION_NAME} >> ${TEST_FILE}
+sh ${TEST_FILE}
+sed -i '' "s/^${FUNCTION_NAME}/${FUNCTION_NAME} --name Taro/g" ${TEST_FILE}
+sh ${TEST_FILE}
+sed -i '' "s/^${FUNCTION_NAME}/${FUNCTION_NAME} --name Taro --country Japan   /g" ${TEST_FILE}
+sh ${TEST_FILE}
 
 echo ""
 echo "================="
 echo ${COUNT}". multiple required arguments and one optional argument"
 COUNT=$(( COUNT + 1 ))
-bash ${SCRIPT_PATH} -n getUserData -r name,Taro,"A user name" -r country,Japan,"A country" -o language,Japanese,"A user language"
+bash ${SCRIPT_PATH} -n ${FUNCTION_NAME} -r name,Taro,"A user name" -r country,Japan,"A country" -o language,Japanese,"A user language" |tee ${TEST_FILE}
+echo ${FUNCTION_NAME} >> ${TEST_FILE}
+sed -i '' "s/^${FUNCTION_NAME}/${FUNCTION_NAME} --name Taro --country Japan /g" ${TEST_FILE}
+sh ${TEST_FILE}
+sed -i '' "s/^${FUNCTION_NAME}/${FUNCTION_NAME} --name Taro --country Japan --language English/g" ${TEST_FILE}
+sh ${TEST_FILE}
 
 echo ""
 echo "================="
 echo ${COUNT}". multiple required arguments and multiple optional argument"
 COUNT=$(( COUNT + 1 ))
-bash ${SCRIPT_PATH} -n getUserData -r name,Taro,"A user name" -r country,Japan,"A country" -o language,Japanese,"A user language" -o age,30,"age" 
+bash ${SCRIPT_PATH} -n ${FUNCTION_NAME} -r name,Taro,"A user name" -r country,Japan,"A country" -o language,Japanese,"A user language" -o age,30,"age" |tee ${TEST_FILE}
+echo ${FUNCTION_NAME} >> ${TEST_FILE}
+sed -i '' "s/^${FUNCTION_NAME}/${FUNCTION_NAME} --name Taro --country Japan --language English/g" ${TEST_FILE}
+sh ${TEST_FILE}
+sed -i '' "s/^${FUNCTION_NAME}/${FUNCTION_NAME} --name Taro --country Japan --language English --age 30/g" ${TEST_FILE}
+sh ${TEST_FILE}
 
 echo ""
 echo "================="
 echo ${COUNT}". multiple required arguments and multiple optional argument and one flag arugment"
 COUNT=$(( COUNT + 1 ))
-bash ${SCRIPT_PATH} -n getUserData -r name,Taro,"A user name" -r country,Japan,"A country" -o language,Japanese,"A user language" -o age,30,"age" -f isBrother,"Enable brother flag"
+bash ${SCRIPT_PATH} -n ${FUNCTION_NAME} -r name,Taro,"A user name" -r country,Japan,"A country" -o language,Japanese,"A user language" -o age,30,"age" -f isBrother,"Enable brother flag" |tee ${TEST_FILE}
+echo ${FUNCTION_NAME} >> ${TEST_FILE}
+sed -i '' "s/^${FUNCTION_NAME}/${FUNCTION_NAME} --name Taro --country Japan --language English --age 30/g" ${TEST_FILE}
+sh ${TEST_FILE}
+sed -i '' "s/^${FUNCTION_NAME}/${FUNCTION_NAME} --name Taro --country Japan --language English --age 30 --isBrother/g" ${TEST_FILE}
+sh ${TEST_FILE}
 
 echo ""
 echo "================="
 echo ${COUNT}". multiple required arguments and multiple optional argument and multiple flag arugment"
 COUNT=$(( COUNT + 1 ))
-bash ${SCRIPT_PATH} -n getUserData -r name,Taro,"A user name" -r country,Japan,"A country" -o language,Japanese,"A user language" -o age,30,"age" -f isBrother,"Enable brother flag" -f isDryRun,"Enable dryrun mode"
-
-echo ""
-echo "================="
-echo ${COUNT}". multiple required arguments and multiple optional argument and multiple flag arugment"
-COUNT=$(( COUNT + 1 ))
-bash ${SCRIPT_PATH} -n getUserData -r name,Taro,"A user name" -r country,Japan,"A country" -o language,Japanese,"A user language" -o age,30,"age" -f isBrother,"Enable brother flag" -f isDryRun,"Enable dryrun mode"
+bash ${SCRIPT_PATH} -n ${FUNCTION_NAME} -r name,Taro,"A user name" -r country,Japan,"A country" -o language,Japanese,"A user language" -o age,30,"age" -f isBrother,"Enable brother flag" -f isDryRun,"Enable dryrun mode" |tee ${TEST_FILE}
+echo ${FUNCTION_NAME} >> ${TEST_FILE}
+sed -i '' "s/^${FUNCTION_NAME}/${FUNCTION_NAME} --name Taro --country Japan --language English --age 30/g" ${TEST_FILE}
+sh ${TEST_FILE}
+sed -i '' "s/^${FUNCTION_NAME}/${FUNCTION_NAME} --name Taro --country Japan --language English --age 30  --isBrother --isDryRun/g" ${TEST_FILE}
+sh ${TEST_FILE}
 
 echo ""
 echo "================="
 echo ${COUNT}". random order argument"
 COUNT=$(( COUNT + 1 ))
-bash ${SCRIPT_PATH} -n getUserData -f isDryRun,"Enable dryrun mode" -r name,Taro,"A user name" -o language,Japanese,"A user language" -r country,Japan,"A country" -o age,30,"age" -f isBrother,"Enable brother flag"
+bash ${SCRIPT_PATH} -n ${FUNCTION_NAME} -f isDryRun,"Enable dryrun mode" -r name,Taro,"A user name" -o language,Japanese,"A user language" -r country,Japan,"A country" -o age,30,"age" -f isBrother,"Enable brother flag" |tee ${TEST_FILE}
+echo ${FUNCTION_NAME} >> ${TEST_FILE}
+sed -i '' "s/^${FUNCTION_NAME}/${FUNCTION_NAME} --name Taro --country Japan --language English --age 30/g" ${TEST_FILE}
+sh ${TEST_FILE}
+sed -i '' "s/^${FUNCTION_NAME}/${FUNCTION_NAME} --name Taro --country Japan --language English --age 30  --isBrother --isDryRun/g" ${TEST_FILE}
+sh ${TEST_FILE}
