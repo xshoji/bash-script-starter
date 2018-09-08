@@ -53,7 +53,7 @@ COUNT=1
 TEST_FILE=/tmp/test.sh
 echo ""
 echo "================="
-    echo ${COUNT}". error"
+echo ${COUNT}". error"
 COUNT=$(( COUNT + 1 ))
 bash ${SCRIPT_PATH}
 

@@ -65,14 +65,16 @@ done
 # Functions
 #==========================================
 
-function printUsageExecutionExampleBase() {
+function printFunctionDocumentBase() {
 
     echo "#######################################"
+    local HAS_DESCRIPTION=""
     for ARG in "$@"
     do
+      HAS_DESCRIPTION="true"
       echo "# ${ARG}"
     done
-    echo "#"
+    [ "${HAS_DESCRIPTION}" == "true" ] && { echo "#"; }
     echo "# Usage:"
 
 }
@@ -150,7 +152,7 @@ function printParameterDescriptionFlag() {
 
 
 
-function printUsageFunctionBottomPart() {
+function printFunctionDocumentBottomPart() {
     echo "#######################################"
 }
 
@@ -248,7 +250,7 @@ function printVariableOptional() {
 #==========================================
 
 # Print usage example
-printUsageExecutionExampleBase ${ARGS_DESCRIPTION[@]+"${ARGS_DESCRIPTION[@]}"}
+printFunctionDocumentBase ${ARGS_DESCRIPTION[@]+"${ARGS_DESCRIPTION[@]}"}
 echo -n "#   ${FUNCTION_NAME}"
 
 # - [Bash empty array expansion with `set -u` - Stack Overflow](https://stackoverflow.com/questions/7577052/bash-empty-array-expansion-with-set-u)
@@ -280,7 +282,7 @@ if [ ${#ARGS_OPTIONAL[@]} -gt 0 ] || [ ${#ARGS_FLAG[@]} -gt 0 ]; then
     printParameterDescriptionFlag ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
 fi
 
-printUsageFunctionBottomPart
+printFunctionDocumentBottomPart
 
 
 printFunctionTopPart ${FUNCTION_NAME}
