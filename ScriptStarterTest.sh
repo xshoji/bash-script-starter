@@ -48,9 +48,10 @@ done
 # Main
 #------------------------------------------
 COUNT=1
-
-
 TEST_FILE=/tmp/test.sh
+#trap "rm -rf ${TEST_FILE}" EXIT
+
+
 echo ""
 echo "================="
 echo ${COUNT}". error"
@@ -170,5 +171,3 @@ ${TEST_FILE} --debug
 ${TEST_FILE} --debug -x xxx
 ${TEST_FILE} -x xxx -h
 ${TEST_FILE} -x xxx --help
-
-rm -rf ${TEST_FILE} 
