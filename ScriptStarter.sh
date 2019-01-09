@@ -208,7 +208,6 @@ function printParameterDescriptionFlag() {
 function printUsageFunctionBottomPart() {
 cat << __EOT__
 _EOT_
-exit 1
 }
 
 __EOT__
