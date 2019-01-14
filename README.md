@@ -106,7 +106,7 @@ bash-4.2#
 
 Optional parameters are not validated.
 
-These optional parameters are initialized by empty string.
+These optional parameters are initialized by default value.
 
 ```
 bash-4.2# curl -sf ${STARTER_URL} |bash -s - -n MyScript -a xshoji -o id,1001 -o name,xshoji,"A user name.","guest" > /tmp/MyScript > MyScript
