@@ -21,7 +21,7 @@ bash-4.2# curl -sf ${STARTER_URL} |bash -s
   ------------------- author: xshoji
 
   Usage:
-    ./bash --naming scriptName --author name [ --description "ScriptStarter's description here." --required paramName,sample --required ... --option paramName,sample --option ... --flag flagName --flag ... --env varName,sample --env ... --short ]
+    ./ScriptStarter.sh --naming scriptName --author name [ --description "ScriptStarter's description here." --required paramName,sample --required ... --option paramName,sample --option ... --flag flagName --flag ... --env varName,sample --env ... --short ]
 
   Description:
     This script generates a template of bash script tool.
@@ -31,12 +31,13 @@ bash-4.2# curl -sf ${STARTER_URL} |bash -s
     --author,-a authorName : Script author.
 
   Optional parameters:
-    --description,-d "Description"             : Description of this script. [ example: --description "ScriptStarter's description here." ]
-    --required,-r paramName,sample,description : Required parameter setting. [ example: --required id,1001,"Primary id here." ]
-    --option,-o paramName,sample,description   : Optional parameter setting. [ example: --option name,xshoji,"User name here." ]
-    --flag,-f flagName,description             : Optional flag parameter setting. [ example: --flag dryRun,"Dry run mode." ]
-    --env,-e varName,sample                    : Required environment variable. [ example: --env API_HOST,example.com ]
-    --short,-s                                 : Enable short parameter. [ example: --short ]
+    --description,-d "Description"                          : Description of this script. [ example: --description "ScriptStarter's description here." ]
+    --required,-r paramName,sample,description              : Required parameter setting. [ example: --required id,1001,"Primary id here." ]
+    --option,-o paramName,sample,description                : Optional parameter setting ( sample is used as a default value). [ example: --option name,xshoji,"User name here." ]
+    --option,-o paramName,sample,description,defaultValue   : Optional parameter setting. [ example: --option name,xshoji,"User name here.",testUser ]
+    --flag,-f flagName,description                          : Optional flag parameter setting. [ example: --flag dryRun,"Dry run mode." ]
+    --env,-e varName,sample                                 : Required environment variable. [ example: --env API_HOST,example.com ]
+    --short,-s                                              : Enable short parameter. [ example: --short ]
 
 bash-4.2#
 ```
