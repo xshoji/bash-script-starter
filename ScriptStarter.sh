@@ -20,12 +20,13 @@ cat << _EOT_
     --author,-a authorName : Script author.
 
   Optional parameters:
-    --description,-d "Description"             : Description of this script. [ example: --description "ScriptStarter's description here." ]
-    --required,-r paramName,sample,description : Required parameter setting. [ example: --required id,1001,"Primary id here." ]
-    --option,-o paramName,sample,description   : Optional parameter setting. [ example: --option name,xshoji,"User name here." ]
-    --flag,-f flagName,description             : Optional flag parameter setting. [ example: --flag dryRun,"Dry run mode." ]
-    --env,-e varName,sample                    : Required environment variable. [ example: --env API_HOST,example.com ]
-    --short,-s                                 : Enable short parameter. [ example: --short ]
+    --description,-d "Description"                          : Description of this script. [ example: --description "ScriptStarter's description here." ]
+    --required,-r paramName,sample,description              : Required parameter setting. [ example: --required id,1001,"Primary id here." ]
+    --option,-o paramName,sample,description                : Optional parameter setting ( sample is used as a default value). [ example: --option name,xshoji,"User name here." ]
+    --option,-o paramName,sample,description,defaultValue   : Optional parameter setting. [ example: --option name,xshoji,"User name here.",testUser ]
+    --flag,-f flagName,description                          : Optional flag parameter setting. [ example: --flag dryRun,"Dry run mode." ]
+    --env,-e varName,sample                                 : Required environment variable. [ example: --env API_HOST,example.com ]
+    --short,-s                                              : Enable short parameter. [ example: --short ]
 
 _EOT_
 exit 1
@@ -185,6 +186,30 @@ function printParameterDescription() {
 
 
 
+function printParameterDescriptionOptional() {
+    for ARG in "$@"
+    do
+        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
+        local SAMPLE=$(awk -F',' '{print $2}' <<<${1})
+        local DESCRIPTION=$(awk -F',' '{print $3}' <<<${1})
+        local DEFAULT=$(awk -F',' '{print $4}' <<<${1})
+        local PARAM_NAME_SHORT=$(cut -c 1 <<<${PARAM_NAME})
+        [ "${SAMPLE}" == "" ] && { SAMPLE=${PARAM_NAME}; }
+        [ "${DESCRIPTION}" == "" ] && { DESCRIPTION="${SAMPLE} is specified as ${PARAM_NAME}"; }
+        [ "${DEFAULT}" == "" ] && { DEFAULT="${SAMPLE}"; }
+        local IS_USED_SHORT_PARAM=$(grep "${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
+        echo -n "    --${PARAM_NAME}"
+        if [ "${SHORT}" == "true" ] && [ "${IS_USED_SHORT_PARAM}" == "" ]; then
+            ARGS_SHORT+=("${PARAM_NAME_SHORT}")
+            echo -n ",-${PARAM_NAME_SHORT}"
+        fi
+        echo " ${SAMPLE} : ${DESCRIPTION} [ default: ${DEFAULT} ]"
+        shift 1
+    done
+}
+
+
+
 function printParameterDescriptionFlag() {
     for ARG in "$@"
     do
@@ -275,8 +300,14 @@ function printSetInitialValue() {
     for ARG in "$@"
     do
         local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
+        local SAMPLE=$(awk -F',' '{print $2}' <<<${1})
+        local DESCRIPTION=$(awk -F',' '{print $3}' <<<${1})
+        local DEFAULT=$(awk -F',' '{print $4}' <<<${1})
+        local PARAM_NAME_SHORT=$(cut -c 1 <<<${PARAM_NAME})
+        [ "${SAMPLE}" == "" ] && { SAMPLE=${PARAM_NAME}; }
+        [ "${DEFAULT}" == "" ] && { DEFAULT="${SAMPLE}"; }
         local VAR_NAME=$(echo ${PARAM_NAME} | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
-        echo '[ -z "${'"${VAR_NAME}"'+x}" ] && { '"${VAR_NAME}"=\"\"'; }'
+        echo '[ -z "${'"${VAR_NAME}"'+x}" ] && { '"${VAR_NAME}"=\"${DEFAULT}\"'; }'
         shift 1
     done
 }
@@ -370,7 +401,7 @@ fi
 
 echo "  Optional parameters:"
 if [ ${#ARGS_OPTIONAL[@]} -gt 0 ] || [ ${#ARGS_FLAG[@]} -gt 0 ]; then
-    printParameterDescription ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"}
+    printParameterDescriptionOptional ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"}
     printParameterDescriptionFlag ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
 fi
 echo "    --debug : Enable debug mode"
