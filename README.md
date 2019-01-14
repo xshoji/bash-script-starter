@@ -109,7 +109,7 @@ Optional parameters are not validated.
 These optional parameters are initialized by empty string.
 
 ```
-bash-4.2# curl -sf ${STARTER_URL} |bash -s - -n MyScript -a xshoji -o id,1001 -o name,xshoji > MyScript
+bash-4.2# curl -sf ${STARTER_URL} |bash -s - -n MyScript -a xshoji -o id,1001 -o name,xshoji,"A user name.","guest" > /tmp/MyScript > MyScript
 bash-4.2# chmod 777 MyScript
 bash-4.2# ./MyScript -h
 
@@ -123,21 +123,21 @@ bash-4.2# ./MyScript -h
     This is MyScript
 
   Optional parameters:
-    --id 1001 : 1001 is specified as id
-    --name xshoji : xshoji is specified as name
+    --id 1001 : 1001 is specified as id [ default: 1001 ]
+    --name xshoji : A user name. [ default: guest ]
     --debug : Enable debug mode
 
 bash-4.2# ./MyScript
 
 [ Optional parameters ]
-id:
-name:
+id: 1001
+name: guest
 
-bash-4.2# ./MyScript --id 1001
+bash-4.2# ./MyScript --name myname
 
 [ Optional parameters ]
 id: 1001
-name:
+name: myname
 
 bash-4.2#
 ```
@@ -243,17 +243,17 @@ bash-4.2# ./MyScript
     --id,-i 1001 : 1001 is specified as id
 
   Optional parameters:
-    --name,-n xshoji : xshoji is specified as name
+    --name,-n xshoji : xshoji is specified as name [ default: xshoji ]
     --dryRun,-d : Enable dryRun flag
     --debug : Enable debug mode
 
-bash-4.2# ./MyScript -i 1001 -n xshoji -d
+bash-4.2# ./MyScript -i 1001 -n myname -d
 
 [ Required parameters ]
 id: 1001
 
 [ Optional parameters ]
-name: xshoji
+name: myname
 dryRun: true
 
 bash-4.2#
