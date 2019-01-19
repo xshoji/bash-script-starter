@@ -68,14 +68,15 @@ done
 [ -z "${SHORT+x}" ] && { SHORT="false"; }
 [ -z "${DESCRIPTION+x}" ] && { DESCRIPTION=""; }
 
+# Define constant variable
+PROVISIONAL_STRING=`openssl rand -hex 12 | fold -w 12 | head -1`
+
 
 #==========================================
 # Functions
 #==========================================
 
 function printUsageFunctionTopPart() {
-
-local NAME_LENGTH=${#1}
 
 cat << __EOT__
 #!/bin/bash
@@ -88,10 +89,11 @@ cat << _EOT_
 __EOT__
 
 echo -n '  '
-for ((i=0; i < ${NAME_LENGTH}+5; i++)); do
-    echo -n '-'
-done
-echo " author: ${2}" 
+local NAME_LENGTH=${#1}
+NAME_LENGTH=$((NAME_LENGTH + 5))
+COMMAND="printf -- '-%.0s' {1..${NAME_LENGTH}}"
+eval ${COMMAND}
+echo " author: ${2}"
 echo ""
 
 }
@@ -162,8 +164,34 @@ function printEnvironmentVariableDescription() {
 }
 
 
-
 function printParameterDescription() {
+
+    local PARAMETER_SAMPLE_LENGTH_MAX=0
+    local PARAMETER_DESCRIPTION_LINES=()
+    for DESCRIPTION_LINE in "$@"
+    do
+      local CURRENT_PARAM_SAMPLE_STRING=`echo ${DESCRIPTION_LINE} |sed "s/${PROVISIONAL_STRING}.*//g"`
+        SAMPLE_STRING_LENGTH="${#CURRENT_PARAM_SAMPLE_STRING}"
+        if [ "${PARAMETER_SAMPLE_LENGTH_MAX}" -lt "${SAMPLE_STRING_LENGTH}" ]; then
+            PARAMETER_SAMPLE_LENGTH_MAX=${SAMPLE_STRING_LENGTH}
+        fi
+    done
+
+    for DESCRIPTION_LINE in "$@"
+    do
+      local CURRENT_PARAM_SAMPLE_STRING=`echo ${DESCRIPTION_LINE} |sed "s/${PROVISIONAL_STRING}.*//g"`
+      local CURRENT_LINE_LENGTH="${#CURRENT_PARAM_SAMPLE_STRING}"
+      local DIFF_SPACE_LENGTH=$(( PARAMETER_SAMPLE_LENGTH_MAX -  CURRENT_LINE_LENGTH ))
+      CREATE_SPACE_COMMAND="printf ' %.0s' {0..${DIFF_SPACE_LENGTH}}"
+      DIFF_SPACE_STRING=`eval ${CREATE_SPACE_COMMAND}`
+      PRINTED_LINE=`echo ${DESCRIPTION_LINE} |sed "s/${PROVISIONAL_STRING}/${DIFF_SPACE_STRING}/g"`
+      echo "    ${PRINTED_LINE}"
+    done
+}
+
+function printParameterDescriptionRequired() {
+
+    local PARAMETER_DESCRIPTION_LINES=()
     for ARG in "$@"
     do
         # - [csv - Printing column separated by comma using Awk command line - Stack Overflow](https://stackoverflow.com/questions/26842504/printing-column-separated-by-comma-using-awk-command-line)
@@ -172,21 +200,27 @@ function printParameterDescription() {
         local DESCRIPTION=$(awk -F',' '{print $3}' <<<${1})
         local PARAM_NAME_SHORT=$(cut -c 1 <<<${PARAM_NAME})
         [ "${SAMPLE}" == "" ] && { SAMPLE=${PARAM_NAME}; }
-        [ "${DESCRIPTION}" == "" ] && { DESCRIPTION="${SAMPLE} is specified as ${PARAM_NAME}"; }
+        [ "${DESCRIPTION}" == "" ] && { DESCRIPTION="\"${SAMPLE}\" means ${PARAM_NAME}"; }
         local IS_USED_SHORT_PARAM=$(grep "${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
-        echo -n "    --${PARAM_NAME}"
+        local LINE=`echo -n "--${PARAM_NAME}"`
         if [ "${SHORT}" == "true" ] && [ "${IS_USED_SHORT_PARAM}" == "" ]; then
             ARGS_SHORT+=("${PARAM_NAME_SHORT}")
-            echo -n ",-${PARAM_NAME_SHORT}"
+            LINE=`echo -n "${LINE},-${PARAM_NAME_SHORT}"`
         fi
-        echo " ${SAMPLE} : ${DESCRIPTION}"
+        LINE=`echo -n "${LINE} ${SAMPLE}"`
+        LINE=`echo -n "${LINE}${PROVISIONAL_STRING}: ${DESCRIPTION}"`
+        PARAMETER_DESCRIPTION_LINES+=( "${LINE}" )
         shift 1
     done
+
+    printParameterDescription "${PARAMETER_DESCRIPTION_LINES[@]}"
 }
 
 
 
 function printParameterDescriptionOptional() {
+
+    local PARAMETER_DESCRIPTION_LINES=()
     for ARG in "$@"
     do
         local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
@@ -195,17 +229,21 @@ function printParameterDescriptionOptional() {
         local DEFAULT=$(awk -F',' '{print $4}' <<<${1})
         local PARAM_NAME_SHORT=$(cut -c 1 <<<${PARAM_NAME})
         [ "${SAMPLE}" == "" ] && { SAMPLE=${PARAM_NAME}; }
-        [ "${DESCRIPTION}" == "" ] && { DESCRIPTION="${SAMPLE} is specified as ${PARAM_NAME}"; }
+        [ "${DESCRIPTION}" == "" ] && { DESCRIPTION="\"${SAMPLE}\" means ${PARAM_NAME}"; }
         [ "${DEFAULT}" == "" ] && { DEFAULT="${SAMPLE}"; }
         local IS_USED_SHORT_PARAM=$(grep "${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
-        echo -n "    --${PARAM_NAME}"
+        local LINE=`echo -n "--${PARAM_NAME}"`
         if [ "${SHORT}" == "true" ] && [ "${IS_USED_SHORT_PARAM}" == "" ]; then
             ARGS_SHORT+=("${PARAM_NAME_SHORT}")
-            echo -n ",-${PARAM_NAME_SHORT}"
+            LINE=`echo -n "${LINE},-${PARAM_NAME_SHORT}"`
         fi
-        echo " ${SAMPLE} : ${DESCRIPTION} [ default: ${DEFAULT} ]"
+        LINE=`echo -n "${LINE} ${SAMPLE}"`
+        LINE=`echo -n "${LINE}${PROVISIONAL_STRING}: ${DESCRIPTION} [ default: ${DEFAULT} ]"`
+        PARAMETER_DESCRIPTION_LINES+=( "${LINE}" )
         shift 1
     done
+
+    printParameterDescription "${PARAMETER_DESCRIPTION_LINES[@]}"
 }
 
 
@@ -405,7 +443,7 @@ fi
 
 if [ ${#ARGS_REQUIRED[@]} -gt 0 ]; then
     echo "  Required parameters:"
-    printParameterDescription "${ARGS_REQUIRED[@]}"
+    printParameterDescriptionRequired "${ARGS_REQUIRED[@]}"
     echo " "
 fi
 
