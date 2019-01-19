@@ -121,9 +121,9 @@ ${TEST_FILE} --aaa aaa --bbb bbb --ccc
 
 echo ""
 echo "================="
-echo ${COUNT}". Required, Optional and Flag parameter are specified with a shorten option. Optional parameter has description and default value. ( a lot of parameters )"
+echo ${COUNT}". Required, Optional, Flag and Environment parameter are specified with a shorten option. Optional parameter has description and default value. ( a lot of parameters )"
 COUNT=$(( COUNT + 1 ))
-./${SCRIPT_PATH} -n test -a user -r a111,a111,"a111 param is here." -r a2222,a222222,"a2222 param is here." -r a3,a3,"a3 param is here." -o b1,b11,"b1 param is here.","DefaultB1" -o b22,b2222,"b22 param is here.","DefaultB22" -o b333,b33333,"b333 param is here.","DefaultB333" -f c11111,"c11111 flag is here." -f c222,"c222 flag is here." -f c3,"c3 flag is here." > ${TEST_FILE}
+./${SCRIPT_PATH} -n test -a user -r a111,a111,"a111 param is here." -r a2222,a222222,"a2222 param is here." -r a3,a3,"a3 param is here." -o b1,b11,"b1 param is here.","DefaultB1" -o b22,b2222,"b22 param is here.","DefaultB22" -o b333,b33333,"b333 param is here.","DefaultB333" -f c11111,"c11111 flag is here." -f c222,"c222 flag is here." -f c3,"c3 flag is here." -e T1,t111,"Test" -e T222,t22222,"Test" -e T3,t3,"t3" > ${TEST_FILE}
 chmod 777 ${TEST_FILE}
 ${TEST_FILE}
 ${TEST_FILE} --aaa aaa

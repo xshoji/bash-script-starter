@@ -249,6 +249,8 @@ function printParameterDescriptionOptional() {
 
 
 function printParameterDescriptionFlag() {
+
+    local PARAMETER_DESCRIPTION_LINES=()
     for ARG in "$@"
     do
         local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
@@ -256,14 +258,17 @@ function printParameterDescriptionFlag() {
         local DESCRIPTION=$(awk -F',' '{print $2}' <<<${1})
         [ "${DESCRIPTION}" == "" ] && { DESCRIPTION="Enable ${PARAM_NAME} flag"; }
         local IS_USED_SHORT_PARAM=$(grep "${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
-        echo -n "    --${PARAM_NAME}"
+        local LINE=`echo -n "--${PARAM_NAME}"`
         if [ "${SHORT}" == "true" ] && [ "${IS_USED_SHORT_PARAM}" == "" ]; then
             ARGS_SHORT+=("${PARAM_NAME_SHORT}")
-            echo -n ",-${PARAM_NAME_SHORT}"
+            LINE=`echo -n "${LINE},-${PARAM_NAME_SHORT}"`
         fi
-        echo " : ${DESCRIPTION}"
+        LINE=`echo -n "${LINE}${PROVISIONAL_STRING}: ${DESCRIPTION}"`
+        PARAMETER_DESCRIPTION_LINES+=( "${LINE}" )
         shift 1
     done
+
+    printParameterDescription "${PARAMETER_DESCRIPTION_LINES[@]}"
 }
 
 
@@ -436,7 +441,7 @@ printScriptDescription
 
 # Print parameter description
 if [ ${#ARGS_ENVIRONMENT[@]} -gt 0 ]; then
-    echo "  Environment settings are required such as follows,"
+    echo "  Environment settings are required such as below"
     printEnvironmentVariableDescription "${ARGS_ENVIRONMENT[@]}"
     echo " "
 fi
@@ -448,10 +453,13 @@ if [ ${#ARGS_REQUIRED[@]} -gt 0 ]; then
 fi
 
 echo "  Optional parameters:"
-if [ ${#ARGS_OPTIONAL[@]} -gt 0 ] || [ ${#ARGS_FLAG[@]} -gt 0 ]; then
+if [ ${#ARGS_OPTIONAL[@]} -gt 0 ]; then
     printParameterDescriptionOptional ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"}
+fi
+if [ ${#ARGS_FLAG[@]} -gt 0 ]; then
     printParameterDescriptionFlag ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
 fi
+
 echo "    --debug : Enable debug mode"
 echo ""
 
