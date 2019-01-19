@@ -48,7 +48,7 @@ bash-4.2#
 
 Plain script no needs parameter.
 
-A `-h` option is supported as default.
+`-h` and `--debug` options are supported as default.
 
 ```
 bash-4.2# curl -sf ${STARTER_URL} |bash -s - -n MyScript -a xshoji > MyScript
