@@ -88,14 +88,14 @@ bash-4.2# ./MyScript
   ------------- author: xshoji
 
   Usage:
-    ./MyScript --id 1001 --name xshoji
+    ./test.sh --id 1001 --name xshoji
 
   Description:
     This is MyScript
 
   Required parameters:
-    --id 1001 : 1001 is specified as id
-    --name xshoji : xshoji is specified as name
+    --id 1001     : "1001" means id
+    --name xshoji : "xshoji" means name
 
   Optional parameters:
     --debug : Enable debug mode
@@ -124,7 +124,7 @@ bash-4.2# ./MyScript -h
     This is MyScript
 
   Optional parameters:
-    --id 1001 : 1001 is specified as id [ default: 1001 ]
+    --id 1001     : "1001" means id [ default: 1001 ]
     --name xshoji : A user name. [ default: guest ]
     --debug : Enable debug mode
 
@@ -241,10 +241,10 @@ bash-4.2# ./MyScript
     This is MyScript
 
   Required parameters:
-    --id,-i 1001 : 1001 is specified as id
+    --id,-i 1001 : "1001" means id
 
   Optional parameters:
-    --name,-n xshoji : xshoji is specified as name [ default: xshoji ]
+    --name,-n xshoji : "xshoji" means name [ default: xshoji ]
     --dryRun,-d : Enable dryRun flag
     --debug : Enable debug mode
 
