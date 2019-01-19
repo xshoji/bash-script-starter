@@ -296,7 +296,7 @@ function printCheckRequiredArgument() {
     done
 }
 
-function printSetInitialValue() {
+function printSetInitialValueOptional() {
     for ARG in "$@"
     do
         local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
@@ -308,6 +308,16 @@ function printSetInitialValue() {
         [ "${DEFAULT}" == "" ] && { DEFAULT="${SAMPLE}"; }
         local VAR_NAME=$(echo ${PARAM_NAME} | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
         echo '[ -z "${'"${VAR_NAME}"'+x}" ] && { '"${VAR_NAME}"=\"${DEFAULT}\"'; }'
+        shift 1
+    done
+}
+
+function printSetInitialValueFlag() {
+    for ARG in "$@"
+    do
+        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
+        local VAR_NAME=$(echo ${PARAM_NAME} | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
+        echo '[ -z "${'"${VAR_NAME}"'+x}" ] && { '"${VAR_NAME}"=\"\"'; }'
         shift 1
     done
 }
@@ -451,8 +461,8 @@ echo '[ ! -z "${INVALID_STATE+x}" ] && { usage; exit 1; }'
 if [ ${#ARGS_OPTIONAL[@]} -gt 0 ] || [ ${#ARGS_FLAG[@]} -gt 0 ]; then
     echo "# Initialize optional variables"
 fi
-printSetInitialValue ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"}
-printSetInitialValue ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
+printSetInitialValueOptional ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"}
+printSetInitialValueFlag ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
 
 cat << __EOT__
 
