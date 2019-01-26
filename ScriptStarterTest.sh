@@ -193,3 +193,22 @@ ${TEST_FILE} --debug
 ${TEST_FILE} --debug -x xxx
 ${TEST_FILE} -x xxx -h
 ${TEST_FILE} -x xxx --help
+
+echo ""
+echo "================="
+echo ${COUNT}". Check code of exit status that help is shown."
+COUNT=$(( COUNT + 1 ))
+./${SCRIPT_PATH} --xxx -f ccc --yyy -o bbb,bbb -r xxx,xxx -n test -a user -s -d "Test script" -d "Second description" -d "Third description" > ${TEST_FILE}
+chmod 777 ${TEST_FILE}
+${TEST_FILE}
+if [[ "$?" != "1" ]]; then
+  echo "==================="
+  echo "====== ERROR ======"
+  echo "==================="
+fi
+${TEST_FILE} -x xxx --help
+if [[ "$?" != "0" ]]; then
+  echo "==================="
+  echo "====== ERROR ======"
+  echo "==================="
+fi
