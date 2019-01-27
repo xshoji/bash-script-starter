@@ -443,18 +443,18 @@ printScriptDescription
 
 # Print parameter description
 if [[ ${#ARGS_ENVIRONMENT[@]} -gt 0 ]]; then
-    echo "  Environment settings are required such as below"
+    echo "  Environment variables: "
     printEnvironmentVariableDescription "${ARGS_ENVIRONMENT[@]}"
     echo " "
 fi
 
 if [[ ${#ARGS_REQUIRED[@]} -gt 0 ]]; then
-    echo "  Required parameters:"
+    echo "  Required:"
     printParameterDescriptionRequired "${ARGS_REQUIRED[@]}"
     echo " "
 fi
 
-echo "  Optional parameters:"
+echo "  Optional:"
 if [[ ${#ARGS_OPTIONAL[@]} -gt 0 ]]; then
     printParameterDescriptionOptional ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"}
 fi
