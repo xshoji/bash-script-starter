@@ -26,11 +26,11 @@ bash-4.2# curl -sf ${STARTER_URL} |bash -s
   Description:
     This script generates a template of bash script tool.
 
-  Required parameters:
+  Required:
     --naming,-n scriptName : Script name.
     --author,-a authorName : Script author.
 
-  Optional parameters:
+  Optional:
     --description,-d "Description"                          : Description of this script. [ example: --description "ScriptStarter's description here." ]
     --required,-r paramName,sample,description              : Required parameter setting. [ example: --required id,1001,"Primary id here." ]
     --option,-o paramName,sample,description                : Optional parameter setting ( sample is used as a default value). [ example: --option name,xshoji,"User name here." ]
@@ -63,7 +63,7 @@ bash-4.2# ./MyScript -h
   Description:
     This is MyScript
 
-  Optional parameters:
+  Optional:
     --debug : Enable debug mode
 
 bash-4.2# ./MyScript
@@ -93,11 +93,11 @@ bash-4.2# ./MyScript
   Description:
     This is MyScript
 
-  Required parameters:
+  Required:
     --id 1001     : "1001" means id
     --name xshoji : "xshoji" means name
 
-  Optional parameters:
+  Optional:
     --debug : Enable debug mode
 
 bash-4.2#
@@ -123,7 +123,7 @@ bash-4.2# ./MyScript -h
   Description:
     This is MyScript
 
-  Optional parameters:
+  Optional:
     --id 1001     : "1001" means id [ default: 1001 ]
     --name xshoji : A user name. [ default: guest ]
     --debug : Enable debug mode
@@ -162,7 +162,7 @@ bash-4.2# ./MyScript -h
   Description:
     This is MyScript
 
-  Optional parameters:
+  Optional:
     --strict : Enable strict flag
     --dryRun : Enable dryRun flag
     --debug : Enable debug mode
@@ -207,7 +207,7 @@ bash-4.2# ./MyScript
     export ENV_VAR_A=1001
     export ENV_VAR_B=xshoji
 
-  Optional parameters:
+  Optional:
     --debug : Enable debug mode
 
 bash-4.2# export export ENV_VAR_A=1001; export ENV_VAR_B=xshoji
@@ -240,10 +240,10 @@ bash-4.2# ./MyScript
   Description:
     This is MyScript
 
-  Required parameters:
+  Required:
     --id,-i 1001 : "1001" means id
 
-  Optional parameters:
+  Optional:
     --name,-n xshoji : "xshoji" means name [ default: xshoji ]
     --dryRun,-d : Enable dryRun flag
     --debug : Enable debug mode
