@@ -218,12 +218,67 @@ chmod 777 ${GENERATED_SCRIPT_FILE_PATH}
 ${GENERATED_SCRIPT_FILE_PATH}
 if [[ "$?" != "1" ]]; then
   echo "==================="
-  echo "====== ERROR ======"
+  echo "====== ERROR : Script status != 1 ======"
   echo "==================="
 fi
 ${GENERATED_SCRIPT_FILE_PATH} -x xxx --help
 if [[ "$?" != "0" ]]; then
   echo "==================="
-  echo "====== ERROR ======"
+  echo "====== ERROR : Script --help status != 0 ======"
+  echo "==================="
+fi
+
+echo ""
+echo "================="
+echo ${COUNT}". Check help short parameter."
+COUNT=$(( COUNT + 1 ))
+./${SCRIPT_PATH} -n test -a user -s -r aaa,aaa -o bbb,bbb > ${GENERATED_SCRIPT_FILE_PATH}
+chmod 777 ${GENERATED_SCRIPT_FILE_PATH}
+${GENERATED_SCRIPT_FILE_PATH}
+if [[ "$?" != "1" ]]; then
+  echo "==================="
+  echo "====== ERROR : Script status != 1 ======"
+  echo "==================="
+fi
+${GENERATED_SCRIPT_FILE_PATH} -h
+if [[ "$?" != "0" ]]; then
+  echo "==================="
+  echo "====== ERROR : Script --help status != 0 ======"
+  echo "==================="
+fi
+${GENERATED_SCRIPT_FILE_PATH} --help
+if [[ "$?" != "0" ]]; then
+  echo "==================="
+  echo "====== ERROR : Script --help status != 0 ======"
+  echo "==================="
+fi
+./${SCRIPT_PATH} -n test -a user -s -r aaa,aaa -o bbb,bbb -r hello,hello > ${GENERATED_SCRIPT_FILE_PATH}
+chmod 777 ${GENERATED_SCRIPT_FILE_PATH}
+${GENERATED_SCRIPT_FILE_PATH}
+if [[ "$?" != "1" ]]; then
+  echo "==================="
+  echo "====== ERROR : Script status != 1 ======"
+  echo "==================="
+fi
+${GENERATED_SCRIPT_FILE_PATH} -a aaa -h hhh
+${GENERATED_SCRIPT_FILE_PATH} --help
+if [[ "$?" != "0" ]]; then
+  echo "==================="
+  echo "====== ERROR : Script --help status != 0 ======"
+  echo "==================="
+fi
+./${SCRIPT_PATH} -n test -a user -s -r aaa,aaa -o bbb,bbb -f hello,hello > ${GENERATED_SCRIPT_FILE_PATH}
+chmod 777 ${GENERATED_SCRIPT_FILE_PATH}
+${GENERATED_SCRIPT_FILE_PATH}
+if [[ "$?" != "1" ]]; then
+  echo "==================="
+  echo "====== ERROR : Script status != 1 ======"
+  echo "==================="
+fi
+${GENERATED_SCRIPT_FILE_PATH} -a aaa -h
+${GENERATED_SCRIPT_FILE_PATH} --help
+if [[ "$?" != "0" ]]; then
+  echo "==================="
+  echo "====== ERROR : Script --help status != 0 ======"
   echo "==================="
 fi
