@@ -292,6 +292,7 @@ function printParseArgument() {
         local CONDITION='[[ "${ARG}" == "--'"${PARAM_NAME}"'" ]]'
         local IS_USED_SHORT_PARAM=$(grep "1${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
         if [[ "${SHORT}" == "true" ]] && [[ "${IS_USED_SHORT_PARAM}" == "" ]]; then
+            [[ "${PARAM_NAME_SHORT}" == "h" ]] && { HELP_SHORT_PARAM_ENABLE="false"; }
             ARGS_SHORT+=("1${PARAM_NAME_SHORT}")
             CONDITION='('"${CONDITION}"' || [[ "${ARG}" == "-'"${PARAM_NAME_SHORT}"'" ]])'
         fi
@@ -310,6 +311,7 @@ function printParseArgumentFlag() {
         local CONDITION='[[ "${ARG}" == "--'"${PARAM_NAME}"'" ]]'
         local IS_USED_SHORT_PARAM=$(grep "1${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
         if [[ "${SHORT}" == "true" ]] && [[ "${IS_USED_SHORT_PARAM}" == "" ]]; then
+            [[ "${PARAM_NAME_SHORT}" == "h" ]] && { HELP_SHORT_PARAM_ENABLE="false"; }
             ARGS_SHORT+=("1${PARAM_NAME_SHORT}")
             CONDITION='('"${CONDITION}"' || [[ "${ARG}" == "-'"${PARAM_NAME_SHORT}"'" ]])'
         fi
@@ -482,12 +484,18 @@ for ARG in "$@"
 do
     SHIFT="true"
     [[ "${ARG}" == "--debug" ]] && { shift 1; set -eux; SHIFT="false"; }
-    ([[ "${ARG}" == "--help" ]] || [[ "${ARG}" == "-h" ]]) && { shift 1; HELP="true"; SHIFT="false"; }
 __EOT__
 
+HELP_SHORT_PARAM_ENABLE="true"
 printParseArgument ${ARGS_REQUIRED[@]+"${ARGS_REQUIRED[@]}"}
 printParseArgument ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"}
 printParseArgumentFlag ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
+
+HELP_PARSER='    [[ "${ARG}" == "--help" ]] && { shift 1; HELP="true"; SHIFT="false"; }'
+if [[ ${HELP_SHORT_PARAM_ENABLE} == "true" ]]; then
+  HELP_PARSER='    ([[ "${ARG}" == "--help" ]] || [[ "${ARG}" == "-h" ]]) && { shift 1; HELP="true"; SHIFT="false"; }'
+fi
+echo "${HELP_PARSER}"
 
 cat << "__EOT__"
     ([[ "${SHIFT}" == "true" ]] && [[ "$#" -gt 0 ]]) && { shift 1; }
