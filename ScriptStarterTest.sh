@@ -282,3 +282,13 @@ if [[ "$?" != "0" ]]; then
   echo "====== ERROR : Script --help status != 0 ======"
   echo "==================="
 fi
+
+echo ""
+echo "================="
+echo ${COUNT}". Check ',' handling."
+COUNT=$(( COUNT + 1 ))
+./${SCRIPT_PATH} -n test -a user -d aaa\,bbb\,ccc\,ddd -d eee\,fff\,ggg -s -r aaa,"aaa\,aaa","aaa\,aaaa" -o bbb,bbb\\,bbb,bbb\\,bbb,bbb\\,bbb -f c3,"c3 flag\, is here." -e T1,t111\\,t111,"Test\,Test" > ${GENERATED_SCRIPT_FILE_PATH}
+${GENERATED_SCRIPT_FILE_PATH} --help
+${GENERATED_SCRIPT_FILE_PATH}
+export T1=aaa
+${GENERATED_SCRIPT_FILE_PATH} -a a -o b -c

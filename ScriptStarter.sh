@@ -39,6 +39,7 @@ exit 1
 set -eu
 
 # Parse parameters
+RANDOM_STRING="k4PxCCMcdIdvj0T"
 ARG_ORG=("$@")
 ARGS_REQUIRED=()
 ARGS_OPTIONAL=()
@@ -98,6 +99,10 @@ echo ""
 
 }
 
+function parseValue() {
+  echo "${1}" |sed "s/\\\,/${RANDOM_STRING}/g" |awk -F',' '{print $'${2}'}' |sed "s/${RANDOM_STRING}/,/g"
+}
+
 function printUsageExecutionExampleBase() {
 
     echo "  Usage:"
@@ -112,8 +117,8 @@ function printUsageExecutionExample() {
     # Add required parameters
     for ARG in "$@"
     do
-        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
-        local SAMPLE=$(awk -F',' '{print $2}' <<<${1})
+        local PARAM_NAME=`parseValue "${1}" 1`
+        local SAMPLE=`parseValue "${1}" 2`
         echo -n ' '"--${PARAM_NAME} ${SAMPLE}"
         shift 1
     done
@@ -126,7 +131,7 @@ function printUsageExecutionExampleFlag() {
     # Add required parameters
     for ARG in "$@"
     do
-        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
+        local PARAM_NAME=`parseValue "${1}" 1`
         echo -n ' '"--${PARAM_NAME}"
         shift 1
     done
@@ -156,8 +161,8 @@ __EOT__
 function printEnvironmentVariableDescription() {
     for ARG in "$@"
     do
-        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
-        local SAMPLE=$(awk -F',' '{print $2}' <<<${1})
+        local PARAM_NAME=`parseValue "${1}" 1`
+        local SAMPLE=`parseValue "${1}" 2`
         echo "    export ${PARAM_NAME}=${SAMPLE}"
         shift 1
     done
@@ -195,9 +200,9 @@ function printParameterDescriptionRequired() {
     for ARG in "$@"
     do
         # - [csv - Printing column separated by comma using Awk command line - Stack Overflow](https://stackoverflow.com/questions/26842504/printing-column-separated-by-comma-using-awk-command-line)
-        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
-        local SAMPLE=$(awk -F',' '{print $2}' <<<${1})
-        local DESCRIPTION=$(awk -F',' '{print $3}' <<<${1})
+        local PARAM_NAME=`parseValue "${1}" 1`
+        local SAMPLE=`parseValue "${1}" 2`
+        local DESCRIPTION=`parseValue "${1}" 3`
         local PARAM_NAME_SHORT=$(cut -c 1 <<<${PARAM_NAME})
         [[ "${SAMPLE}" == "" ]] && { SAMPLE=${PARAM_NAME}; }
         [[ "${DESCRIPTION}" == "" ]] && { DESCRIPTION="\"${SAMPLE}\" means ${PARAM_NAME}"; }
@@ -223,10 +228,10 @@ function printParameterDescriptionOptional() {
     local PARAMETER_DESCRIPTION_LINES=()
     for ARG in "$@"
     do
-        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
-        local SAMPLE=$(awk -F',' '{print $2}' <<<${1})
-        local DESCRIPTION=$(awk -F',' '{print $3}' <<<${1})
-        local DEFAULT=$(awk -F',' '{print $4}' <<<${1})
+        local PARAM_NAME=`parseValue "${1}" 1`
+        local SAMPLE=`parseValue "${1}" 2`
+        local DESCRIPTION=`parseValue "${1}" 3`
+        local DEFAULT=`parseValue "${1}" 4`
         local PARAM_NAME_SHORT=$(cut -c 1 <<<${PARAM_NAME})
         [[ "${SAMPLE}" == "" ]] && { SAMPLE=${PARAM_NAME}; }
         [[ "${DESCRIPTION}" == "" ]] && { DESCRIPTION="\"${SAMPLE}\" means ${PARAM_NAME}"; }
@@ -253,9 +258,9 @@ function printParameterDescriptionFlag() {
     local PARAMETER_DESCRIPTION_LINES=()
     for ARG in "$@"
     do
-        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
+        local PARAM_NAME=`parseValue "${1}" 1`
         local PARAM_NAME_SHORT=$(cut -c 1 <<<${PARAM_NAME})
-        local DESCRIPTION=$(awk -F',' '{print $2}' <<<${1})
+        local DESCRIPTION=`parseValue "${1}" 2`
         [[ "${DESCRIPTION}" == "" ]] && { DESCRIPTION="Enable ${PARAM_NAME} flag"; }
         local IS_USED_SHORT_PARAM=$(grep "${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
         local LINE=`echo -n "--${PARAM_NAME}"`
@@ -286,7 +291,7 @@ __EOT__
 function printParseArgument() {
     for ARG in "$@"
     do
-        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
+        local PARAM_NAME=`parseValue "${1}" 1`
         local PARAM_NAME_SHORT=$(cut -c 1 <<<${1})
         local VAR_NAME=$(echo ${PARAM_NAME} | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
         local CONDITION='[[ "${ARG}" == "--'"${PARAM_NAME}"'" ]]'
@@ -305,7 +310,7 @@ function printParseArgument() {
 function printParseArgumentFlag() {
     for ARG in "$@"
     do
-        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
+        local PARAM_NAME=`parseValue "${1}" 1`
         local PARAM_NAME_SHORT=$(cut -c 1 <<<${1})
         local VAR_NAME=$(echo ${PARAM_NAME} | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
         local CONDITION='[[ "${ARG}" == "--'"${PARAM_NAME}"'" ]]'
@@ -325,8 +330,8 @@ function printParseArgumentFlag() {
 function printCheckRequiredEnvironmentVariable() {
     for ARG in "$@"
     do
-        local VAR_NAME=$(awk -F',' '{print $1}' <<<${1})
-        local SAMPLE=$(awk -F',' '{print $2}' <<<${1})
+        local VAR_NAME=`parseValue "${1}" 1`
+        local SAMPLE=`parseValue "${1}" 2`
         echo '[[ -z "${'"${VAR_NAME}"'+x}" ]] && { echo "[!] export '"${VAR_NAME}"'='"${SAMPLE}"' is required. "; INVALID_STATE="true"; }'
         shift 1
     done
@@ -336,7 +341,7 @@ function printCheckRequiredEnvironmentVariable() {
 function printCheckRequiredArgument() {
     for ARG in "$@"
     do
-        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
+        local PARAM_NAME=`parseValue "${1}" 1`
         local VAR_NAME=$(echo ${PARAM_NAME} | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
         echo '[[ -z "${'"${VAR_NAME}"'+x}" ]] && { echo "[!] --'"${PARAM_NAME}"' is required. "; INVALID_STATE="true"; }'
         shift 1
@@ -346,10 +351,10 @@ function printCheckRequiredArgument() {
 function printSetInitialValueOptional() {
     for ARG in "$@"
     do
-        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
-        local SAMPLE=$(awk -F',' '{print $2}' <<<${1})
-        local DESCRIPTION=$(awk -F',' '{print $3}' <<<${1})
-        local DEFAULT=$(awk -F',' '{print $4}' <<<${1})
+        local PARAM_NAME=`parseValue "${1}" 1`
+        local SAMPLE=`parseValue "${1}" 2`
+        local DESCRIPTION=`parseValue "${1}" 3`
+        local DEFAULT=`parseValue "${1}" 4`
         local PARAM_NAME_SHORT=$(cut -c 1 <<<${PARAM_NAME})
         [[ "${SAMPLE}" == "" ]] && { SAMPLE=${PARAM_NAME}; }
         [[ "${DEFAULT}" == "" ]] && { DEFAULT="${SAMPLE}"; }
@@ -362,7 +367,7 @@ function printSetInitialValueOptional() {
 function printSetInitialValueFlag() {
     for ARG in "$@"
     do
-        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
+        local PARAM_NAME=`parseValue "${1}" 1`
         local VAR_NAME=$(echo ${PARAM_NAME} | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
         echo '[[ -z "${'"${VAR_NAME}"'+x}" ]] && { '"${VAR_NAME}"=\"\"'; }'
         shift 1
@@ -373,7 +378,7 @@ function printVariableEnvironment() {
     echo "[ Environment variables ]"
     for ARG in "$@"
     do
-        local VAR_NAME=$(awk -F',' '{print $1}' <<<${1})
+        local VAR_NAME=`parseValue "${1}" 1`
         echo ${VAR_NAME}': ${'${VAR_NAME}'}'
         shift 1
     done
@@ -385,7 +390,7 @@ function printVariableRequired() {
     echo "[ Required parameters ]"
     for ARG in "$@"
     do
-        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
+        local PARAM_NAME=`parseValue "${1}" 1`
         local VAR_NAME=$(echo ${PARAM_NAME} | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
         echo ${PARAM_NAME}': ${'${VAR_NAME}'}'
         shift 1
@@ -397,7 +402,7 @@ function printVariableOptional() {
     echo "[ Optional parameters ]"
     for ARG in "$@"
     do
-        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
+        local PARAM_NAME=`parseValue "${1}" 1`
         local VAR_NAME=$(echo ${PARAM_NAME} | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
         echo ${PARAM_NAME}': ${'${VAR_NAME}'}'
         shift 1
