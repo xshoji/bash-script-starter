@@ -235,7 +235,6 @@ function printParameterDescriptionOptional() {
         local PARAM_NAME_SHORT=$(cut -c 1 <<<${PARAM_NAME})
         [[ "${SAMPLE}" == "" ]] && { SAMPLE=${PARAM_NAME}; }
         [[ "${DESCRIPTION}" == "" ]] && { DESCRIPTION="\"${SAMPLE}\" means ${PARAM_NAME}"; }
-        [[ "${DEFAULT}" == "" ]] && { DEFAULT="${SAMPLE}"; }
         local IS_USED_SHORT_PARAM=$(grep "${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
         local LINE=`echo -n "--${PARAM_NAME}"`
         if [[ "${SHORT}" == "true" ]] && [[ "${IS_USED_SHORT_PARAM}" == "" ]]; then
@@ -243,7 +242,8 @@ function printParameterDescriptionOptional() {
             LINE=`echo -n "${LINE},-${PARAM_NAME_SHORT}"`
         fi
         LINE=`echo -n "${LINE} ${SAMPLE}"`
-        LINE=`echo -n "${LINE}${PROVISIONAL_STRING}: ${DESCRIPTION} [ default: ${DEFAULT} ]"`
+        LINE=`echo -n "${LINE}${PROVISIONAL_STRING}: ${DESCRIPTION}"`
+        [[ "${DEFAULT}" != "" ]] && { LINE=`echo -n "${LINE} [ default: ${DEFAULT} ]"`; }
         PARAMETER_DESCRIPTION_LINES+=( "${LINE}" )
         shift 1
     done
@@ -357,7 +357,6 @@ function printSetInitialValueOptional() {
         local DEFAULT=`parseValue "${1}" 4`
         local PARAM_NAME_SHORT=$(cut -c 1 <<<${PARAM_NAME})
         [[ "${SAMPLE}" == "" ]] && { SAMPLE=${PARAM_NAME}; }
-        [[ "${DEFAULT}" == "" ]] && { DEFAULT="${SAMPLE}"; }
         local VAR_NAME=$(echo ${PARAM_NAME} | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
         echo '[[ -z "${'"${VAR_NAME}"'+x}" ]] && { '"${VAR_NAME}"=\"${DEFAULT}\"'; }'
         shift 1
@@ -369,7 +368,7 @@ function printSetInitialValueFlag() {
     do
         local PARAM_NAME=`parseValue "${1}" 1`
         local VAR_NAME=$(echo ${PARAM_NAME} | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
-        echo '[[ -z "${'"${VAR_NAME}"'+x}" ]] && { '"${VAR_NAME}"=\"\"'; }'
+        echo '[[ -z "${'"${VAR_NAME}"'+x}" ]] && { '"${VAR_NAME}"=\"'false'\"'; }'
         shift 1
     done
 }
