@@ -307,7 +307,7 @@ function printParameterDescriptionFlag() {
 function printUsageFunctionBottomPart() {
 cat << __EOT__
 _EOT_
-  [[ "\${1+x}" != "" ]] && { exit \${1}; }
+  [[ "\${1+x}" != "" ]] && { exit "\${1}"; }
   exit 1
 }
 
@@ -560,7 +560,7 @@ done
 __EOT__
 
 # Help mode
-echo '[[ ! -z "${HELP+x}" ]] && { usage 0; }'
+echo '[[ -n "${HELP+x}" ]] && { usage 0; }'
 
 [[ ${#ARGS_ENVIRONMENT[@]} -gt 0 ]] && { echo "# Check environment variables"; }
 printCheckRequiredEnvironmentVariable ${ARGS_ENVIRONMENT[@]+"${ARGS_ENVIRONMENT[@]}"}
@@ -569,7 +569,7 @@ printCheckRequiredArgument ${ARGS_REQUIRED[@]+"${ARGS_REQUIRED[@]}"}
 
 # Check invalid state
 echo "# Check invalid state and display usage"
-echo '[[ ! -z "${INVALID_STATE+x}" ]] && { usage; }'
+echo '[[ -n "${INVALID_STATE+x}" ]] && { usage; }'
 
 if [[ ${#ARGS_OPTIONAL[@]} -gt 0 ]] || [[ ${#ARGS_FLAG[@]} -gt 0 ]]; then
     echo "# Initialize optional variables"
