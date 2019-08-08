@@ -224,7 +224,7 @@ function printParameterDescriptionRequired() {
         LINE=$(echo -n "--${PARAM_NAME}")
         if [[ "${SHORT}" == "true" ]] && [[ "${IS_USED_SHORT_PARAM}" == "" ]]; then
             ARGS_SHORT+=("${PARAM_NAME_SHORT}")
-            LINE=$(echo -n "${LINE},-${PARAM_NAME_SHORT}")
+            LINE=$(echo -n "-${PARAM_NAME_SHORT}, ${LINE}")
         fi
         LINE=$(echo -n "${LINE} ${SAMPLE}")
         LINE=$(echo -n "${LINE}${PROVISIONAL_STRING}: ${DESCRIPTION}")
@@ -260,7 +260,7 @@ function printParameterDescriptionOptional() {
         LINE=$(echo -n "--${PARAM_NAME}")
         if [[ "${SHORT}" == "true" ]] && [[ "${IS_USED_SHORT_PARAM}" == "" ]]; then
             ARGS_SHORT+=("${PARAM_NAME_SHORT}")
-            LINE=$(echo -n "${LINE},-${PARAM_NAME_SHORT}")
+            LINE=$(echo -n "-${PARAM_NAME_SHORT}, ${LINE}")
         fi
         LINE=$(echo -n "${LINE} ${SAMPLE}")
         LINE=$(echo -n "${LINE}${PROVISIONAL_STRING}: ${DESCRIPTION}")
@@ -292,7 +292,7 @@ function printParameterDescriptionFlag() {
         LINE=$(echo -n "--${PARAM_NAME}")
         if [[ "${SHORT}" == "true" ]] && [[ "${IS_USED_SHORT_PARAM}" == "" ]]; then
             ARGS_SHORT+=("${PARAM_NAME_SHORT}")
-            LINE=$(echo -n "${LINE},-${PARAM_NAME_SHORT}")
+            LINE=$(echo -n "-${PARAM_NAME_SHORT}, ${LINE}")
         fi
         LINE=$(echo -n "${LINE}${PROVISIONAL_STRING}: ${DESCRIPTION}")
         PARAMETER_DESCRIPTION_LINES+=( "${LINE}" )
