@@ -65,15 +65,15 @@ __EOT__
 set +e
 COUNT=1
 GENERATED_SCRIPT_FILE_PATH=/tmp/test.sh
-trap "rm -rf ${GENERATED_SCRIPT_FILE_PATH}" EXIT
+trap "rm -rf ${GENERATED_SCRIPT_FILE_PATH}" EXIT SIGINT
 
-echo ""
+echo;echo;echo;
 echo "================="
 echo ${COUNT}". error."
 COUNT=$(( COUNT + 1 ))
 bash ${SCRIPT_PATH}
 
-echo ""
+echo;echo;echo;
 echo "================="
 echo ${COUNT}". ok."
 COUNT=$(( COUNT + 1 ))
@@ -81,7 +81,7 @@ COUNT=$(( COUNT + 1 ))
 chmod 777 ${GENERATED_SCRIPT_FILE_PATH}
 ${GENERATED_SCRIPT_FILE_PATH}
 
-echo ""
+echo;echo;echo;
 echo "================="
 echo ${COUNT}". Required parameter only."
 COUNT=$(( COUNT + 1 ))
@@ -90,7 +90,7 @@ chmod 777 ${GENERATED_SCRIPT_FILE_PATH}
 ${GENERATED_SCRIPT_FILE_PATH}
 ${GENERATED_SCRIPT_FILE_PATH} --aaa aaa
 
-echo ""
+echo;echo;echo;
 echo "================="
 echo ${COUNT}". Required parameter and Environment parameter are specified."
 COUNT=$(( COUNT + 1 ))
@@ -102,7 +102,7 @@ export TEST=test
 ${GENERATED_SCRIPT_FILE_PATH} --aaa aaa
 unset TEST
 
-echo ""
+echo;echo;echo;
 echo "================="
 echo ${COUNT}". Required parameter and Optional parameter are specified."
 COUNT=$(( COUNT + 1 ))
@@ -112,7 +112,7 @@ ${GENERATED_SCRIPT_FILE_PATH}
 ${GENERATED_SCRIPT_FILE_PATH} --aaa aaa
 ${GENERATED_SCRIPT_FILE_PATH} --aaa aaa --bbb bbb
 
-echo ""
+echo;echo;echo;
 echo "================="
 echo ${COUNT}". Required, Optional, Flag parameter are specified. Optional parameter has description."
 COUNT=$(( COUNT + 1 ))
@@ -123,7 +123,7 @@ ${GENERATED_SCRIPT_FILE_PATH} --aaa aaa
 ${GENERATED_SCRIPT_FILE_PATH} --aaa aaa --bbb bbb
 ${GENERATED_SCRIPT_FILE_PATH} --aaa aaa --bbb bbb --ccc
 
-echo ""
+echo;echo;echo;
 echo "================="
 echo ${COUNT}". Required, Optional, Flag parameter are specified. Optional parameter has description and default value."
 COUNT=$(( COUNT + 1 ))
@@ -134,7 +134,7 @@ ${GENERATED_SCRIPT_FILE_PATH} --aaa aaa
 ${GENERATED_SCRIPT_FILE_PATH} --aaa aaa --bbb bbb
 ${GENERATED_SCRIPT_FILE_PATH} --aaa aaa --bbb bbb --ccc
 
-echo ""
+echo;echo;echo;
 echo "================="
 echo ${COUNT}". Required, Optional, Flag and Environment parameter are specified with a shorten option. Optional parameter has description and default value. ( a lot of parameters )"
 COUNT=$(( COUNT + 1 ))
@@ -145,7 +145,7 @@ ${GENERATED_SCRIPT_FILE_PATH} --aaa aaa
 ${GENERATED_SCRIPT_FILE_PATH} --aaa aaa --bbb bbb
 ${GENERATED_SCRIPT_FILE_PATH} --aaa aaa --bbb bbb --ccc
 
-echo ""
+echo;echo;echo;
 echo "================="
 echo ${COUNT}". Optional and Flag parameter are specified. "
 COUNT=$(( COUNT + 1 ))
@@ -155,7 +155,7 @@ ${GENERATED_SCRIPT_FILE_PATH}
 ${GENERATED_SCRIPT_FILE_PATH} --bbb bbb
 ${GENERATED_SCRIPT_FILE_PATH} --bbb bbb --ccc
 
-echo ""
+echo;echo;echo;
 echo "================="
 echo ${COUNT}". Strange parameters are specified by free order."
 COUNT=$(( COUNT + 1 ))
@@ -168,7 +168,7 @@ ${GENERATED_SCRIPT_FILE_PATH} --bbb bbb --ccc --xxx xxx
 ${GENERATED_SCRIPT_FILE_PATH} --debug 
 ${GENERATED_SCRIPT_FILE_PATH} --debug --xxx xxx
 
-echo ""
+echo;echo;echo;
 echo "================="
 echo ${COUNT}". Strange parameters are specified with a shorten option by free order."
 COUNT=$(( COUNT + 1 ))
@@ -181,7 +181,7 @@ ${GENERATED_SCRIPT_FILE_PATH} --bbb bbb --ccc --xxx xxx
 ${GENERATED_SCRIPT_FILE_PATH} --debug 
 ${GENERATED_SCRIPT_FILE_PATH} --debug --xxx xxx
 
-echo ""
+echo;echo;echo;
 echo "================="
 echo ${COUNT}". Strange parameters are specified with a shorten option by free order. Additonaly, generated script supports shorten options too because -s option is specified."
 COUNT=$(( COUNT + 1 ))
@@ -194,7 +194,7 @@ ${GENERATED_SCRIPT_FILE_PATH} -b bbb -c -x x
 ${GENERATED_SCRIPT_FILE_PATH} --debug
 ${GENERATED_SCRIPT_FILE_PATH} --debug -x xxx
 
-echo ""
+echo;echo;echo;
 echo "================="
 echo ${COUNT}". Multi line description is specified."
 COUNT=$(( COUNT + 1 ))
@@ -209,7 +209,7 @@ ${GENERATED_SCRIPT_FILE_PATH} --debug -x xxx
 ${GENERATED_SCRIPT_FILE_PATH} -x xxx -h
 ${GENERATED_SCRIPT_FILE_PATH} -x xxx --help
 
-echo ""
+echo;echo;echo;
 echo "================="
 echo ${COUNT}". Check code of exit status that help is shown."
 COUNT=$(( COUNT + 1 ))
@@ -228,7 +228,7 @@ if [[ "$?" != "0" ]]; then
   echo "==================="
 fi
 
-echo ""
+echo;echo;echo;
 echo "================="
 echo ${COUNT}". Check help short parameter."
 COUNT=$(( COUNT + 1 ))
@@ -283,7 +283,7 @@ if [[ "$?" != "0" ]]; then
   echo "==================="
 fi
 
-echo ""
+echo;echo;echo;
 echo "================="
 echo ${COUNT}". Check ',' handling."
 COUNT=$(( COUNT + 1 ))

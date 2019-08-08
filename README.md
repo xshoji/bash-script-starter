@@ -15,29 +15,28 @@ Display usage.
 ```
 bash-4.2# curl -sf ${STARTER_URL} |bash -s
 [!] --naming is required.
-[!] --author is required.
 
-   ScriptStarter
-  ------------------- author: xshoji
+ ScriptStarter
+------------------ author: xshoji
 
-  Usage:
-    ./ScriptStarter.sh --naming scriptName --author name [ --description "ScriptStarter's description here." --required paramName,sample --required ... --option paramName,sample --option ... --flag flagName --flag ... --env varName,sample --env ... --short ]
+Usage:
+  ./ScriptStarter.sh --naming scriptName [ --author author --description Description --required paramName,sample,description --required ... --optional paramName,sample,description,defaultValue(omittable) --optional ... --flag flagName,description --flag ... --env variableName,sample --env ... --short ]
 
-  Description:
-    This script generates a template of bash script tool.
+Description:
+  This script generates a template of bash script tool.
 
-  Required:
-    --naming,-n scriptName : Script name.
-    --author,-a authorName : Script author.
+Required:
+  -n, --naming scriptName : Script name.
 
-  Optional:
-    --description,-d "Description"                          : Description of this script. [ example: --description "ScriptStarter's description here." ]
-    --required,-r paramName,sample,description              : Required parameter setting. [ example: --required id,1001,"Primary id here." ]
-    --option,-o paramName,sample,description                : Optional parameter setting ( sample is used as a default value). [ example: --option name,xshoji,"User name here." ]
-    --option,-o paramName,sample,description,defaultValue   : Optional parameter setting. [ example: --option name,xshoji,"User name here.",testUser ]
-    --flag,-f flagName,description                          : Optional flag parameter setting. [ example: --flag dryRun,"Dry run mode." ]
-    --env,-e varName,sample                                 : Required environment variable. [ example: --env API_HOST,example.com ]
-    --short,-s                                              : Enable short parameter. [ example: --short ]
+Optional:
+  -a, --author author                                                 : Script author. [ default: anonymous ]
+  -d, --description Description                                       : Description of this script. [ example: --description "ScriptStarter's description here." ]
+  -r, --required paramName,sample,description                         : Required parameter setting. [ example: --required id,1001,"Primary id here." ]
+  -o, --optional paramName,sample,description,defaultValue(omittable) : Optional parameter setting. [ example: --option name,xshoji,"User name here.",defaultUser ]
+  -f, --flag flagName,description                                     : Optional flag parameter setting. [ example: --flag dryRun,"Dry run mode." ]
+  -e, --env variableName,sample                                       : Required environment variable. [ example: --env API_HOST,example.com ]
+  -s, --short : Enable short parameter. [ example: --short ]
+  --debug : Enable debug mode
 
 bash-4.2#
 ```
@@ -231,22 +230,22 @@ bash-4.2# curl -sf ${STARTER_URL} |bash -s - -n MyScript -a xshoji -r id,1001 -o
 bash-4.2# ./MyScript
 [!] --id is required.
 
-   MyScript
-  ------------- author: xshoji
+ MyScript
+------------- author: xshoji
 
-  Usage:
-    ./MyScript --id 1001 [ --name xshoji --dryRun ]
+Usage:
+  ./MyScript --id 1001 [ --name xshoji --dryRun ]
 
-  Description:
-    This is MyScript
+Description:
+  This is MyScript
 
-  Required:
-    --id,-i 1001 : "1001" means id
+Required:
+  -i, --id 1001 : "1001" means id
 
-  Optional:
-    --name,-n xshoji : "xshoji" means name [ default: xshoji ]
-    --dryRun,-d : Enable dryRun flag
-    --debug : Enable debug mode
+Optional:
+  -n, --name xshoji : "xshoji" means name
+  -d, --dryRun : Enable dryRun flag
+  --debug : Enable debug mode
 
 bash-4.2# ./MyScript -i 1001 -n myname -d
 

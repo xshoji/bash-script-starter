@@ -2,35 +2,38 @@
 
 function usage()
 {
-cat << "_EOT_"
-
-   ScriptStarter   
-  ------------------- author: xshoji
-
-_EOT_
 cat << _EOT_
-  Usage:
-    ./$(basename "$0") --naming scriptName --author name [ --description "ScriptStarter's description here." --required paramName,sample --required ... --option paramName,sample --option ... --flag flagName --flag ... --env varName,sample --env ... --short ]
 
-  Description:
-    This script generates a template of bash script tool.
- 
-  Required parameters:
-    --naming,-n scriptName : Script name.
-    --author,-a authorName : Script author.
+ ScriptStarter
+------------------ author: xshoji
 
-  Optional parameters:
-    --description,-d "Description"                          : Description of this script. [ example: --description "ScriptStarter's description here." ]
-    --required,-r paramName,sample,description              : Required parameter setting. [ example: --required id,1001,"Primary id here." ]
-    --option,-o paramName,sample,description                : Optional parameter setting ( sample is used as a default value). [ example: --option name,xshoji,"User name here." ]
-    --option,-o paramName,sample,description,defaultValue   : Optional parameter setting. [ example: --option name,xshoji,"User name here.",testUser ]
-    --flag,-f flagName,description                          : Optional flag parameter setting. [ example: --flag dryRun,"Dry run mode." ]
-    --env,-e varName,sample                                 : Required environment variable. [ example: --env API_HOST,example.com ]
-    --short,-s                                              : Enable short parameter. [ example: --short ]
+Usage:
+  ./$(basename "$0") --naming scriptName [ --author author --description Description --required paramName,sample,description --required ... --optional paramName,sample,description,defaultValue(omittable) --optional ... --flag flagName,description --flag ... --env variableName,sample --env ... --short ]
+
+Description:
+  This script generates a template of bash script tool.
+
+Required:
+  -n, --naming scriptName : Script name.
+
+Optional:
+  -a, --author author                                                 : Script author. [ default: anonymous ]
+  -d, --description Description                                       : Description of this script. [ example: --description "ScriptStarter's description here." ]
+  -r, --required paramName,sample,description                         : Required parameter setting. [ example: --required id,1001,"Primary id here." ]
+  -o, --optional paramName,sample,description,defaultValue(omittable) : Optional parameter setting. [ example: --option name,xshoji,"User name here.",defaultUser ]
+  -f, --flag flagName,description                                     : Optional flag parameter setting. [ example: --flag dryRun,"Dry run mode." ]
+  -e, --env variableName,sample                                       : Required environment variable. [ example: --env API_HOST,example.com ]
+  -s, --short : Enable short parameter. [ example: --short ]
+  --debug : Enable debug mode
 
 _EOT_
-exit 1
+  [[ "${1+x}" != "" ]] && { exit "${1}"; }
+  exit 1
 }
+
+
+
+
 
 #==========================================
 # Preparation
@@ -51,26 +54,29 @@ for ARG in "$@"
 do
     SHIFT="true"
     { [[ "${ARG}" == "--debug" ]]; } && { shift 1; set -eux; SHIFT="false"; }
-    { [[ "${ARG}" == "--naming" ]]      || [[ "${ARG}" == "-n" ]]; } && { shift 1; SCRIPT_NAME="${1}"; SHIFT="false"; }
+    { [[ "${ARG}" == "--naming" ]]      || [[ "${ARG}" == "-n" ]]; } && { shift 1; NAMING="${1}"; SHIFT="false"; }
     { [[ "${ARG}" == "--author" ]]      || [[ "${ARG}" == "-a" ]]; } && { shift 1; AUTHOR="${1}"; SHIFT="false"; }
     { [[ "${ARG}" == "--required" ]]    || [[ "${ARG}" == "-r" ]]; } && { shift 1; ARGS_REQUIRED+=("${1}"); SHIFT="false"; }
-    { [[ "${ARG}" == "--option" ]]      || [[ "${ARG}" == "-o" ]]; } && { shift 1; ARGS_OPTIONAL+=("${1}"); SHIFT="false"; }
+    { [[ "${ARG}" == "--optional" ]]    || [[ "${ARG}" == "-o" ]]; } && { shift 1; ARGS_OPTIONAL+=("${1}"); SHIFT="false"; }
     { [[ "${ARG}" == "--flag" ]]        || [[ "${ARG}" == "-f" ]]; } && { shift 1; ARGS_FLAG+=("${1}"); SHIFT="false"; }
     { [[ "${ARG}" == "--env" ]]         || [[ "${ARG}" == "-e" ]]; } && { shift 1; ARGS_ENVIRONMENT+=("${1}"); SHIFT="false"; }
     { [[ "${ARG}" == "--short" ]]       || [[ "${ARG}" == "-s" ]]; } && { shift 1; SHORT="true"; SHIFT="false"; }
     { [[ "${ARG}" == "--description" ]] || [[ "${ARG}" == "-d" ]]; } && { shift 1; ARGS_DESCRIPTION+=("${1}"); SHIFT="false"; }
     { [[ "${SHIFT}" == "true" ]] && [[ "$#" -gt 0 ]]; } && { shift 1; }
 done
-# Check require parameters
-[[ -z "${SCRIPT_NAME+x}" ]] && { echo "[!] --naming is required. "; INVALID_STATE="true"; }
-[[ -z "${AUTHOR+x}" ]] && { echo "[!] --author is required. "; INVALID_STATE="true"; }
-[[ -n "${INVALID_STATE+x}" ]] && { usage; exit 1; }
-[[ -z "${SHORT+x}" ]] && { SHORT="false"; }
+[[ -n "${HELP+x}" ]] && { usage 0; }
+# Check required parameters
+[[ -z "${NAMING+x}" ]] && { echo "[!] --naming is required. "; INVALID_STATE="true"; }
+# Check invalid state and display usage
+[[ -n "${INVALID_STATE+x}" ]] && { usage; }
+# Initialize optional variables
+[[ -z "${AUTHOR+x}" ]] && { AUTHOR="anonymous"; }
 [[ -z "${DESCRIPTION+x}" ]] && { DESCRIPTION=""; }
+[[ -z "${SHORT+x}" ]] && { SHORT="false"; }
 
 # Define constant variable
 PROVISIONAL_STRING=$(openssl rand -hex 12 | fold -w 12 | head -1)
-
+BASE_INDENT=""
 
 #==========================================
 # Functions
@@ -85,10 +91,10 @@ function usage()
 {
 cat << _EOT_
 
-   ${1}
+${BASE_INDENT} ${1}
 __EOT__
 
-echo -n '  '
+echo -n "${BASE_INDENT}"
 local NAME_LENGTH=${#1}
 NAME_LENGTH=$((NAME_LENGTH + 5))
 COMMAND="printf -- '-%.0s' {1..${NAME_LENGTH}}"
@@ -104,8 +110,8 @@ function parseValue() {
 
 function printUsageExecutionExampleBase() {
 
-    echo "  Usage:"
-    echo -n "    ./\$(basename \"\$0\")"
+    echo "${BASE_INDENT}Usage:"
+    echo -n "${BASE_INDENT}  ./\$(basename \"\$0\")"
 
 }
 
@@ -142,17 +148,17 @@ function printUsageExecutionExampleFlag() {
 function printScriptDescription() {
 cat << __EOT__
 
-  Description:
+${BASE_INDENT}Description:
 __EOT__
     local PRINTED_DESCRIPTIONS=()
     if [[ ${#ARGS_DESCRIPTION[@]} -gt 0 ]]; then
         PRINTED_DESCRIPTIONS=("${ARGS_DESCRIPTION[@]}")
     else
-        PRINTED_DESCRIPTIONS+=("This is ${SCRIPT_NAME}")
+        PRINTED_DESCRIPTIONS+=("This is ${NAMING}")
     fi
     for PRINTED_DESCRIPTION in "${PRINTED_DESCRIPTIONS[@]}"
     do
-        echo "    ${PRINTED_DESCRIPTION}"
+        echo "${BASE_INDENT}  ${PRINTED_DESCRIPTION}"
     done
     echo ""
 }
@@ -165,7 +171,7 @@ function printEnvironmentVariableDescription() {
     do
         PARAM_NAME=$(parseValue "${1}" 1)
         SAMPLE=$(parseValue "${1}" 2)
-        echo "    export ${PARAM_NAME}=${SAMPLE}"
+        echo "${BASE_INDENT}  export ${PARAM_NAME}=${SAMPLE}"
         shift 1
     done
 }
@@ -198,7 +204,7 @@ function printParameterDescription() {
         CREATE_SPACE_COMMAND="printf ' %.0s' {0..${DIFF_SPACE_LENGTH}}"
         DIFF_SPACE_STRING=$(eval "${CREATE_SPACE_COMMAND}")
         PRINTED_LINE=$(echo "${DESCRIPTION_LINE}" |sed "s/${PROVISIONAL_STRING}/${DIFF_SPACE_STRING}/g")
-        echo "    ${PRINTED_LINE}"
+        echo "${BASE_INDENT}  ${PRINTED_LINE}"
     done
 }
 
@@ -471,7 +477,7 @@ function printVariableOptional() {
 # Main
 #==========================================
 
-printUsageFunctionTopPart "${SCRIPT_NAME}" "${AUTHOR}"
+printUsageFunctionTopPart "${NAMING}" "${AUTHOR}"
 
 
 
@@ -502,18 +508,18 @@ printScriptDescription
 
 # Print parameter description
 if [[ ${#ARGS_ENVIRONMENT[@]} -gt 0 ]]; then
-    echo "  Environment variables: "
+    echo "${BASE_INDENT}Environment variables: "
     printEnvironmentVariableDescription "${ARGS_ENVIRONMENT[@]}"
     echo " "
 fi
 
 if [[ ${#ARGS_REQUIRED[@]} -gt 0 ]]; then
-    echo "  Required:"
+    echo "${BASE_INDENT}Required:"
     printParameterDescriptionRequired "${ARGS_REQUIRED[@]}"
     echo " "
 fi
 
-echo "  Optional:"
+echo "${BASE_INDENT}Optional:"
 if [[ ${#ARGS_OPTIONAL[@]} -gt 0 ]]; then
     printParameterDescriptionOptional ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"}
 fi
@@ -521,7 +527,7 @@ if [[ ${#ARGS_FLAG[@]} -gt 0 ]]; then
     printParameterDescriptionFlag ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
 fi
 
-echo "    --debug : Enable debug mode"
+echo "${BASE_INDENT}  --debug : Enable debug mode"
 echo ""
 
 printUsageFunctionBottomPart
@@ -605,3 +611,18 @@ if [[ ${#ARGS_OPTIONAL[@]} -gt 0 ]] || [[ ${#ARGS_FLAG[@]} -gt 0 ]]; then
 fi
 
 [[ -n "${REQUIRED_EOT+x}" ]] && { echo '__EOT__'; }
+
+
+#bash ~/Develop/bashscript/bash-script-starter/ScriptStarter.sh \
+#  -n ScriptStarter \
+#  -a xshoji \
+#  -d "This script generates a template of bash script tool." \
+#  -r naming,scriptName,"Script name." \
+#  -o author,author,"Script author.",anonymous \
+#  -o description,"Description","Description of this script. [ example: --description \"ScriptStarter's description here.\" ]" \
+#  -o required,"paramName\,sample\,description","Required parameter setting. [ example: --required id\,1001\,\"Primary id here.\" ]" \
+#  -o optional,"paramName\,sample\,description\,defaultValue(omittable)","Optional parameter setting. [ example: --option name\,xshoji\,\"User name here.\"\,defaultUser ]" \
+#  -o flag,"flagName\,description","Optional flag parameter setting. [ example: --flag dryRun\,\"Dry run mode.\" ]" \
+#  -o env,"variableName\,sample","Required environment variable. [ example: --env API_HOST\,example.com ]" \
+#  -f short,"Enable short parameter. [ example: --short ]" \
+#  -s > /tmp/test.sh
