@@ -53,17 +53,17 @@ Plain script no needs parameter.
 bash-4.2# curl -sf ${STARTER_URL} |bash -s - -n MyScript -a xshoji > MyScript
 bash-4.2# ./MyScript -h
 
-   MyScript
-  ------------- author: xshoji
+ MyScript
+------------- author: xshoji
 
-  Usage:
-    ./MyScript
+Usage:
+  ./MyScript
 
-  Description:
-    This is MyScript
+Description:
+  This is MyScript
 
-  Optional:
-    --debug : Enable debug mode
+Optional:
+  --debug : Enable debug mode
 
 bash-4.2# ./MyScript
 bash-4.2#
@@ -76,28 +76,26 @@ Required parameters are validated.
 Missing parameters are displayed as `[!]`.
 
 ```
-bash-4.2#
 bash-4.2# curl -sf ${STARTER_URL} |bash -s - -n MyScript -a xshoji -r id,1001 -r name,xshoji > MyScript
-bash-4.2# chmod 777 MyScript
 bash-4.2# ./MyScript
 [!] --id is required.
 [!] --name is required.
 
-   MyScript
-  ------------- author: xshoji
+ MyScript
+------------- author: xshoji
 
-  Usage:
-    ./test.sh --id 1001 --name xshoji
+Usage:
+  ./MyScript --id 1001 --name xshoji
 
-  Description:
-    This is MyScript
+Description:
+  This is MyScript
 
-  Required:
-    --id 1001     : "1001" means id
-    --name xshoji : "xshoji" means name
+Required:
+  --id 1001     : "1001" means id
+  --name xshoji : "xshoji" means name
 
-  Optional:
-    --debug : Enable debug mode
+Optional:
+  --debug : Enable debug mode
 
 bash-4.2#
 ```
@@ -110,22 +108,21 @@ These optional parameters are initialized by default value.
 
 ```
 bash-4.2# curl -sf ${STARTER_URL} |bash -s - -n MyScript -a xshoji -o id,1001 -o name,xshoji,"A user name.","guest" > /tmp/MyScript > MyScript
-bash-4.2# chmod 777 MyScript
 bash-4.2# ./MyScript -h
 
-   MyScript
-  ------------- author: xshoji
+ MyScript
+------------- author: xshoji
 
-  Usage:
-    ./MyScript [ --id 1001 --name xshoji ]
+Usage:
+  ./MyScript [ --id 1001 --name xshoji ]
 
-  Description:
-    This is MyScript
+Description:
+  This is MyScript
 
-  Optional:
-    --id 1001     : "1001" means id [ default: 1001 ]
-    --name xshoji : A user name. [ default: guest ]
-    --debug : Enable debug mode
+Optional:
+  --id 1001     : "1001" means id
+  --name xshoji : A user name. [ default: guest ]
+  --debug : Enable debug mode
 
 bash-4.2# ./MyScript
 
@@ -136,8 +133,8 @@ name: guest
 bash-4.2# ./MyScript --name myname
 
 [ Optional parameters ]
-id: 1001
-name: myname
+id:
+name: guest
 
 bash-4.2#
 ```
@@ -152,30 +149,30 @@ These flags are set "true" string on enabling (default: empty string).
 bash-4.2# curl -sf ${STARTER_URL} |bash -s - -n MyScript -a xshoji -f strict -f dryRun > MyScript
 bash-4.2# ./MyScript -h
 
-   MyScript
-  ------------- author: xshoji
+ MyScript
+------------- author: xshoji
 
-  Usage:
-    ./MyScript [ --strict --dryRun ]
+Usage:
+  ./MyScript [ --strict --dryRun ]
 
-  Description:
-    This is MyScript
+Description:
+  This is MyScript
 
-  Optional:
-    --strict : Enable strict flag
-    --dryRun : Enable dryRun flag
-    --debug : Enable debug mode
+Optional:
+  --strict : Enable strict flag
+  --dryRun : Enable dryRun flag
+  --debug : Enable debug mode
 
 bash-4.2# ./MyScript --strict
 
 [ Optional parameters ]
 strict: true
-dryRun:
+dryRun: false
 
 bash-4.2# ./MyScript --dryRun
 
 [ Optional parameters ]
-strict:
+strict: false
 dryRun: true
 
 bash-4.2#
@@ -193,21 +190,21 @@ bash-4.2# ./MyScript
 [!] export ENV_VAR_A=1001 is required.
 [!] export ENV_VAR_B=xshoji is required.
 
-   MyScript
-  ------------- author: xshoji
+ MyScript
+------------- author: xshoji
 
-  Usage:
-    ./MyScript
+Usage:
+  ./MyScript
 
-  Description:
-    This is MyScript
+Description:
+  This is MyScript
 
-  Environment settings are required such as follows,
-    export ENV_VAR_A=1001
-    export ENV_VAR_B=xshoji
+Environment variables:
+  export ENV_VAR_A=1001
+  export ENV_VAR_B=xshoji
 
-  Optional:
-    --debug : Enable debug mode
+Optional:
+  --debug : Enable debug mode
 
 bash-4.2# export export ENV_VAR_A=1001; export ENV_VAR_B=xshoji
 bash-4.2# ./MyScript
