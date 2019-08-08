@@ -4,23 +4,23 @@ function usage()
 {
 cat << _EOT_
 
-   ScriptStarterTest   
-  ---------------------- author: xshoji
+ ScriptStarterTest
+---------------------- author: xshoji
 
-  Usage:
-    ./$(basename "$0") --scriptPath /path/to/ScriptStarter.sh
+Usage:
+  ./$(basename "$0") --scriptPath /path/to/ScriptStarter.sh
 
-  Description:
-    This is ScriptStarterTest
+Description:
+  This is ScriptStarterTest
 
-  Required:
-    --scriptPath,-s /path/to/ScriptStarter.sh : "/path/to/ScriptStarter.sh" means scriptPath
+Required:
+  -s, --scriptPath /path/to/ScriptStarter.sh : "/path/to/ScriptStarter.sh" means scriptPath
 
-  Optional:
-    --debug : Enable debug mode
+Optional:
+  --debug : Enable debug mode
 
 _EOT_
-  [[ "${1+x}" != "" ]] && { exit ${1}; }
+  [[ "${1+x}" != "" ]] && { exit "${1}"; }
   exit 1
 }
 
@@ -37,16 +37,15 @@ for ARG in "$@"
 do
     SHIFT="true"
     [[ "${ARG}" == "--debug" ]] && { shift 1; set -eux; SHIFT="false"; }
-    ([[ "${ARG}" == "--help" ]] || [[ "${ARG}" == "-h" ]]) && { shift 1; HELP="true"; SHIFT="false"; }
-    ([[ "${ARG}" == "--scriptPath" ]] || [[ "${ARG}" == "-s" ]]) && { shift 1; SCRIPT_PATH="${1}"; SHIFT="false"; }
-    ([[ "${SHIFT}" == "true" ]] && [[ "$#" -gt 0 ]]) && { shift 1; }
+    { [[ "${ARG}" == "--scriptPath" ]] || [[ "${ARG}" == "-s" ]]; } && { shift 1; SCRIPT_PATH="${1}"; SHIFT="false"; }
+    { [[ "${ARG}" == "--help" ]] || [[ "${ARG}" == "-h" ]]; } && { shift 1; HELP="true"; SHIFT="false"; }
+    { [[ "${SHIFT}" == "true" ]] && [[ "$#" -gt 0 ]]; } && { shift 1; }
 done
-[[ ! -z "${HELP+x}" ]] && { usage 0; }
+[[ -n "${HELP+x}" ]] && { usage 0; }
 # Check required parameters
 [[ -z "${SCRIPT_PATH+x}" ]] && { echo "[!] --scriptPath is required. "; INVALID_STATE="true"; }
 # Check invalid state and display usage
-[[ ! -z "${INVALID_STATE+x}" ]] && { usage; }
-
+[[ -n "${INVALID_STATE+x}" ]] && { usage; }
 
 
 #------------------------------------------
@@ -60,7 +59,11 @@ scriptPath: ${SCRIPT_PATH}
 
 __EOT__
 
-# bash ~/Develop/bashscript/bash-script-starter/ScriptStarter.sh -n ScriptStarterTest -a xshoji -r scriptPath,"/path/to/ScriptStarter.sh" -s > /tmp/test.sh
+# bash ~/Develop/bashscript/bash-script-starter/ScriptStarter.sh \
+#   -n ScriptStarterTest \
+#   -a xshoji \
+#   -r scriptPath,"/path/to/ScriptStarter.sh" \
+#   -s > /tmp/test.sh
 
 set +e
 COUNT=1
