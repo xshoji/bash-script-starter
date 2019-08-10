@@ -109,6 +109,22 @@ function parseValue() {
   echo "${1}" |sed "s/\\\,/${RANDOM_STRING}/g" |awk -F',' '{print $'"${2}"'}' |sed "s/${RANDOM_STRING}/,/g"
 }
 
+
+function printScriptDescription() {
+    local PRINTED_DESCRIPTIONS=()
+    if [[ ${#ARGS_DESCRIPTION[@]} -gt 0 ]]; then
+        PRINTED_DESCRIPTIONS=("${ARGS_DESCRIPTION[@]}")
+    else
+        PRINTED_DESCRIPTIONS+=("This is ${NAMING}.")
+    fi
+    for PRINTED_DESCRIPTION in "${PRINTED_DESCRIPTIONS[@]}"
+    do
+        echo "${BASE_INDENT}${PRINTED_DESCRIPTION}"
+    done
+    echo
+}
+
+
 function printUsageExecutionExampleBase() {
 
     echo "${BASE_INDENT}Usage:"
@@ -142,22 +158,6 @@ function printUsageExecutionExampleFlag() {
         echo -n ' '"--${PARAM_NAME}"
         shift 1
     done
-}
-
-
-
-function printScriptDescription() {
-    local PRINTED_DESCRIPTIONS=()
-    if [[ ${#ARGS_DESCRIPTION[@]} -gt 0 ]]; then
-        PRINTED_DESCRIPTIONS=("${ARGS_DESCRIPTION[@]}")
-    else
-        PRINTED_DESCRIPTIONS+=("This is ${NAMING}")
-    fi
-    for PRINTED_DESCRIPTION in "${PRINTED_DESCRIPTIONS[@]}"
-    do
-        echo "${BASE_INDENT}${PRINTED_DESCRIPTION}"
-    done
-    echo
 }
 
 
