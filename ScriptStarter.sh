@@ -23,7 +23,7 @@ Optional:
   -f, --flag flagName,description                                     : Optional flag setting. [ example: --flag dryRun,"Dry run mode." ]
   -e, --env variableName,sample                                       : Required environment variable setting. [ example: --env API_HOST,example.com ]
   -s, --short : Enable short parameter. [ example: --short ]
-  --debug : Enable debug mode
+  --debug : Enable debug mode.
 
 _EOT_
   [[ "${1+x}" != "" ]] && { exit "${1}"; }
@@ -523,7 +523,7 @@ if [[ ${#ARGS_FLAG[@]} -gt 0 ]]; then
     printParameterDescriptionFlag ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
 fi
 
-echo "${BASE_INDENT}  --debug : Enable debug mode"
+echo "${BASE_INDENT}  --debug : Enable debug mode."
 echo
 
 printUsageFunctionBottomPart
