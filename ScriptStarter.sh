@@ -10,7 +10,7 @@ cat << _EOT_
 This script generates a template of bash script tool.
 
 Usage:
-  ./$(basename "$0") --naming scriptName [ --author author --description Description --required paramName,sample,description --required ... --optional paramName,sample,description,defaultValue(omittable) --optional ... --flag flagName,description --flag ... --env variableName,sample --env ... --short ]
+  ./$(basename "$0") --naming scriptName [ --author author --description Description --description ... --required paramName,sample,description --required ... --optional paramName,sample,description,defaultValue(omittable) --optional ... --flag flagName,description --flag ... --env variableName,sample --env ... --short ]
 
 Required:
   -n, --naming scriptName : Script name.
@@ -23,7 +23,9 @@ Optional:
   -f, --flag flagName,description                                     : Optional flag setting. [ example: --flag dryRun,"Dry run mode." ]
   -e, --env variableName,sample                                       : Required environment variable setting. [ example: --env API_HOST,example.com ]
   -s, --short : Enable short parameter. [ example: --short ]
-  --debug : Enable debug mode
+
+Helper options:
+  --help, --debug
 
 _EOT_
   [[ "${1+x}" != "" ]] && { exit "${1}"; }
@@ -41,7 +43,6 @@ _EOT_
 set -eu
 
 # Parse parameters
-RANDOM_STRING="k4PxCCMcdIdvj0T"
 ARGS_REQUIRED=()
 ARGS_OPTIONAL=()
 ARGS_FLAG=()
@@ -65,7 +66,7 @@ do
 done
 [[ -n "${HELP+x}" ]] && { usage 0; }
 # Check required parameters
-[[ -z "${NAMING+x}" ]] && { echo "[!] --naming is required. "; INVALID_STATE="true"; }
+[[ -z "${NAMING+x}" ]] && { printf "\033[0;33m[!] --naming is required.\033[0m\n"; INVALID_STATE="true"; }
 # Check invalid state and display usage
 [[ -n "${INVALID_STATE+x}" ]] && { usage; }
 # Initialize optional variables
@@ -73,9 +74,12 @@ done
 [[ -z "${DESCRIPTION+x}" ]] && { DESCRIPTION=""; }
 [[ -z "${SHORT+x}" ]] && { SHORT="false"; }
 
+
 # Define constant variable
 PROVISIONAL_STRING=$(openssl rand -hex 12 | fold -w 12 | head -1)
 BASE_INDENT=""
+ERROR_COLOR='\033[0;33m' # yellow
+CLEAR_COLOR='\033[0m'
 
 #==========================================
 # Functions
@@ -106,8 +110,28 @@ echo
 }
 
 function parseValue() {
-  echo "${1}" |sed "s/\\\,/${RANDOM_STRING}/g" |awk -F',' '{print $'"${2}"'}' |sed "s/${RANDOM_STRING}/,/g"
+  echo "${1}" |sed "s/\\\,/${PROVISIONAL_STRING}/g" |awk -F',' '{print $'"${2}"'}' |sed "s/${PROVISIONAL_STRING}/,/g"
 }
+
+function toVarName() {
+  local PARAM_NAME="${1}"
+  echo "${PARAM_NAME}" | perl -pe 's/(?:^|_|-)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}'
+}
+
+function printScriptDescription() {
+    local PRINTED_DESCRIPTIONS=()
+    if [[ ${#ARGS_DESCRIPTION[@]} -gt 0 ]]; then
+        PRINTED_DESCRIPTIONS=("${ARGS_DESCRIPTION[@]}")
+    else
+        PRINTED_DESCRIPTIONS+=("This is ${NAMING}.")
+    fi
+    for PRINTED_DESCRIPTION in "${PRINTED_DESCRIPTIONS[@]}"
+    do
+        echo "${BASE_INDENT}${PRINTED_DESCRIPTION}"
+    done
+    echo
+}
+
 
 function printUsageExecutionExampleBase() {
 
@@ -142,22 +166,6 @@ function printUsageExecutionExampleFlag() {
         echo -n ' '"--${PARAM_NAME}"
         shift 1
     done
-}
-
-
-
-function printScriptDescription() {
-    local PRINTED_DESCRIPTIONS=()
-    if [[ ${#ARGS_DESCRIPTION[@]} -gt 0 ]]; then
-        PRINTED_DESCRIPTIONS=("${ARGS_DESCRIPTION[@]}")
-    else
-        PRINTED_DESCRIPTIONS+=("This is ${NAMING}")
-    fi
-    for PRINTED_DESCRIPTION in "${PRINTED_DESCRIPTIONS[@]}"
-    do
-        echo "${BASE_INDENT}${PRINTED_DESCRIPTION}"
-    done
-    echo
 }
 
 
@@ -327,7 +335,7 @@ function printParseArgument() {
     do
         PARAM_NAME=$(parseValue "${1}" 1)
         PARAM_NAME_SHORT=$(cut -c 1 <<<"${1}")
-        VAR_NAME=$(echo "${PARAM_NAME}" | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
+        VAR_NAME=$(toVarName "${PARAM_NAME}")
         CONDITION='[[ "${ARG}" == "--'"${PARAM_NAME}"'" ]]'
         IS_USED_SHORT_PARAM=$(grep "1${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
         if [[ "${SHORT}" == "true" ]] && [[ "${IS_USED_SHORT_PARAM}" == "" ]]; then
@@ -351,7 +359,7 @@ function printParseArgumentFlag() {
     do
         PARAM_NAME=$(parseValue "${1}" 1)
         PARAM_NAME_SHORT=$(cut -c 1 <<<"${1}")
-        VAR_NAME=$(echo "${PARAM_NAME}" | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
+        VAR_NAME=$(toVarName "${PARAM_NAME}")
         CONDITION='[[ "${ARG}" == "--'"${PARAM_NAME}"'" ]]'
         IS_USED_SHORT_PARAM=$(grep "1${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
         if [[ "${SHORT}" == "true" ]] && [[ "${IS_USED_SHORT_PARAM}" == "" ]]; then
@@ -373,10 +381,11 @@ function printCheckRequiredEnvironmentVariable() {
     do
         VAR_NAME=$(parseValue "${1}" 1)
         SAMPLE=$(parseValue "${1}" 2)
-        echo '[[ -z "${'"${VAR_NAME}"'+x}" ]] && { echo "[!] export '"${VAR_NAME}"'='"${SAMPLE}"' is required. "; INVALID_STATE="true"; }'
+        echo '[[ -z "${'"${VAR_NAME}"'+x}" ]] && { printf "'"${ERROR_COLOR}"'[!] export '"${VAR_NAME}"'='"${SAMPLE}"' is required.'"${CLEAR_COLOR}"'\n"; INVALID_STATE="true"; }'
         shift 1
     done
 }
+
 
 
 function printCheckRequiredArgument() {
@@ -385,8 +394,8 @@ function printCheckRequiredArgument() {
     for ARG in "$@"
     do
         PARAM_NAME=$(parseValue "${1}" 1)
-        VAR_NAME=$(echo "${PARAM_NAME}" | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
-        echo '[[ -z "${'"${VAR_NAME}"'+x}" ]] && { echo "[!] --'"${PARAM_NAME}"' is required. "; INVALID_STATE="true"; }'
+        VAR_NAME=$(toVarName "${PARAM_NAME}")
+        echo '[[ -z "${'"${VAR_NAME}"'+x}" ]] && { printf "'"${ERROR_COLOR}"'[!] --'"${PARAM_NAME}"' is required.'"${CLEAR_COLOR}"'\n"; INVALID_STATE="true"; }'
         shift 1
     done
 }
@@ -406,7 +415,7 @@ function printSetInitialValueOptional() {
         DEFAULT=$(parseValue "${1}" 4)
         PARAM_NAME_SHORT=$(cut -c 1 <<<"${PARAM_NAME}")
         [[ "${SAMPLE}" == "" ]] && { SAMPLE="${PARAM_NAME}"; }
-        VAR_NAME=$(echo "${PARAM_NAME}" | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
+        VAR_NAME=$(toVarName "${PARAM_NAME}")
         echo '[[ -z "${'"${VAR_NAME}"'+x}" ]] && { '"${VAR_NAME}"=\""${DEFAULT}"\"'; }'
         shift 1
     done
@@ -418,7 +427,7 @@ function printSetInitialValueFlag() {
     for ARG in "$@"
     do
         PARAM_NAME=$(parseValue "${1}" 1)
-        VAR_NAME=$(echo "${PARAM_NAME}" | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
+        VAR_NAME=$(toVarName "${PARAM_NAME}")
         echo '[[ -z "${'"${VAR_NAME}"'+x}" ]] && { '"${VAR_NAME}"=\"'false'\"'; }'
         shift 1
     done
@@ -444,7 +453,7 @@ function printVariableRequired() {
     for ARG in "$@"
     do
         PARAM_NAME=$(parseValue "${1}" 1)
-        VAR_NAME=$(echo "${PARAM_NAME}" | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
+        VAR_NAME=$(toVarName "${PARAM_NAME}")
         echo "${PARAM_NAME}"': ${'"${VAR_NAME}"'}'
         shift 1
     done
@@ -458,7 +467,7 @@ function printVariableOptional() {
     for ARG in "$@"
     do
         PARAM_NAME=$(parseValue "${1}" 1)
-        VAR_NAME=$(echo "${PARAM_NAME}" | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
+        VAR_NAME=$(toVarName "${PARAM_NAME}")
         echo "${PARAM_NAME}"': ${'"${VAR_NAME}"'}'
         shift 1
     done
@@ -523,7 +532,9 @@ if [[ ${#ARGS_FLAG[@]} -gt 0 ]]; then
     printParameterDescriptionFlag ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
 fi
 
-echo "${BASE_INDENT}  --debug : Enable debug mode"
+echo
+echo "${BASE_INDENT}Helper options:"
+echo "${BASE_INDENT}  --help, --debug"
 echo
 
 printUsageFunctionBottomPart
