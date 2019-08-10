@@ -7,11 +7,10 @@ cat << _EOT_
  FunctionStarterTest
 ------------------------ author: xshoji
 
+This is FunctionStarterTest
+
 Usage:
   ./$(basename "$0") --scriptPath /path/to/FunctionStarter.sh
-
-Description:
-  This is FunctionStarterTest
 
 Required:
   -s, --scriptPath /path/to/FunctionStarter.sh : "/path/to/FunctionStarter.sh" means scriptPath

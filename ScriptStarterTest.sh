@@ -7,11 +7,10 @@ cat << _EOT_
  ScriptStarterTest
 ---------------------- author: xshoji
 
+This is ScriptStarterTest
+
 Usage:
   ./$(basename "$0") --scriptPath /path/to/ScriptStarter.sh
-
-Description:
-  This is ScriptStarterTest
 
 Required:
   -s, --scriptPath /path/to/ScriptStarter.sh : "/path/to/ScriptStarter.sh" means scriptPath
@@ -58,12 +57,6 @@ cat << __EOT__
 scriptPath: ${SCRIPT_PATH}
 
 __EOT__
-
-# bash ~/Develop/bashscript/bash-script-starter/ScriptStarter.sh \
-#   -n ScriptStarterTest \
-#   -a xshoji \
-#   -r scriptPath,"/path/to/ScriptStarter.sh" \
-#   -s > /tmp/test.sh
 
 set +e
 COUNT=1
@@ -295,3 +288,10 @@ ${GENERATED_SCRIPT_FILE_PATH} --help
 ${GENERATED_SCRIPT_FILE_PATH}
 export T1=aaa
 ${GENERATED_SCRIPT_FILE_PATH} -a a -o b -d ddd
+
+# STARTER_URL=https://raw.githubusercontent.com/xshoji/bash-script-starter/master/ScriptStarter.sh
+# curl -sf ${STARTER_URL} |bash -s - \
+#   -n ScriptStarterTest \
+#   -a xshoji \
+#   -r scriptPath,"/path/to/ScriptStarter.sh" \
+#   -s > /tmp/test.sh
