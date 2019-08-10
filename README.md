@@ -19,17 +19,16 @@ bash-4.2# curl -sf ${STARTER_URL} |bash -s
  ScriptStarter
 ------------------ author: xshoji
 
+This script generates a template of bash script tool.
+
 Usage:
   ./ScriptStarter.sh --naming scriptName [ --author author --description Description --required paramName,sample,description --required ... --optional paramName,sample,description,defaultValue(omittable) --optional ... --flag flagName,description --flag ... --env variableName,sample --env ... --short ]
-
-Description:
-  This script generates a template of bash script tool.
 
 Required:
   -n, --naming scriptName : Script name.
 
 Optional:
-  -a, --author author                                                 : Script author. [ default: anonymous ]
+  -a, --author author                                                 : Script author.
   -d, --description Description                                       : Description of this script. [ example: --description "ScriptStarter's description here." ]
   -r, --required paramName,sample,description                         : Required parameter setting. [ example: --required id,1001,"Primary id here." ]
   -o, --optional paramName,sample,description,defaultValue(omittable) : Optional parameter setting. [ example: --option name,xshoji,"User name here.",defaultUser ]
@@ -56,11 +55,10 @@ bash-4.2# ./MyScript -h
  MyScript
 ------------- author: xshoji
 
+This is MyScript
+
 Usage:
   ./MyScript
-
-Description:
-  This is MyScript
 
 Optional:
   --debug : Enable debug mode
@@ -84,11 +82,10 @@ bash-4.2# ./MyScript
  MyScript
 ------------- author: xshoji
 
+This is MyScript
+
 Usage:
   ./MyScript --id 1001 --name xshoji
-
-Description:
-  This is MyScript
 
 Required:
   --id 1001     : "1001" means id
@@ -113,11 +110,10 @@ bash-4.2# ./MyScript -h
  MyScript
 ------------- author: xshoji
 
+This is MyScript
+
 Usage:
   ./MyScript [ --id 1001 --name xshoji ]
-
-Description:
-  This is MyScript
 
 Optional:
   --id 1001     : "1001" means id
@@ -152,11 +148,10 @@ bash-4.2# ./MyScript -h
  MyScript
 ------------- author: xshoji
 
+This is MyScript
+
 Usage:
   ./MyScript [ --strict --dryRun ]
-
-Description:
-  This is MyScript
 
 Optional:
   --strict : Enable strict flag
@@ -193,11 +188,10 @@ bash-4.2# ./MyScript
  MyScript
 ------------- author: xshoji
 
+This is MyScript
+
 Usage:
   ./MyScript
-
-Description:
-  This is MyScript
 
 Environment variables:
   export ENV_VAR_A=1001
@@ -230,11 +224,10 @@ bash-4.2# ./MyScript
  MyScript
 ------------- author: xshoji
 
+This is MyScript
+
 Usage:
   ./MyScript --id 1001 [ --name xshoji --dryRun ]
-
-Description:
-  This is MyScript
 
 Required:
   -i, --id 1001 : "1001" means id

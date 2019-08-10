@@ -7,22 +7,21 @@ cat << _EOT_
  ScriptStarter
 ------------------ author: xshoji
 
+This script generates a template of bash script tool.
+
 Usage:
   ./$(basename "$0") --naming scriptName [ --author author --description Description --required paramName,sample,description --required ... --optional paramName,sample,description,defaultValue(omittable) --optional ... --flag flagName,description --flag ... --env variableName,sample --env ... --short ]
-
-Description:
-  This script generates a template of bash script tool.
 
 Required:
   -n, --naming scriptName : Script name.
 
 Optional:
-  -a, --author author                                                 : Script author. [ default: anonymous ]
+  -a, --author author                                                 : Script author.
   -d, --description Description                                       : Description of this script. [ example: --description "ScriptStarter's description here." ]
   -r, --required paramName,sample,description                         : Required parameter setting. [ example: --required id,1001,"Primary id here." ]
   -o, --optional paramName,sample,description,defaultValue(omittable) : Optional parameter setting. [ example: --option name,xshoji,"User name here.",defaultUser ]
-  -f, --flag flagName,description                                     : Optional flag parameter setting. [ example: --flag dryRun,"Dry run mode." ]
-  -e, --env variableName,sample                                       : Required environment variable. [ example: --env API_HOST,example.com ]
+  -f, --flag flagName,description                                     : Optional flag setting. [ example: --flag dryRun,"Dry run mode." ]
+  -e, --env variableName,sample                                       : Required environment variable setting. [ example: --env API_HOST,example.com ]
   -s, --short : Enable short parameter. [ example: --short ]
   --debug : Enable debug mode
 
@@ -70,7 +69,7 @@ done
 # Check invalid state and display usage
 [[ -n "${INVALID_STATE+x}" ]] && { usage; }
 # Initialize optional variables
-[[ -z "${AUTHOR+x}" ]] && { AUTHOR="anonymous"; }
+[[ -z "${AUTHOR+x}" ]] && { AUTHOR=""; }
 [[ -z "${DESCRIPTION+x}" ]] && { DESCRIPTION=""; }
 [[ -z "${SHORT+x}" ]] && { SHORT="false"; }
 
@@ -99,8 +98,10 @@ local NAME_LENGTH=${#1}
 NAME_LENGTH=$((NAME_LENGTH + 5))
 COMMAND="printf -- '-%.0s' {1..${NAME_LENGTH}}"
 eval "${COMMAND}"
-echo " author: ${2}"
-echo ""
+AUTHOR=""
+[[ "${2}" != "" ]] && { AUTHOR=" author: ${2}"; }
+echo "${AUTHOR}"
+echo
 
 }
 
@@ -146,10 +147,6 @@ function printUsageExecutionExampleFlag() {
 
 
 function printScriptDescription() {
-cat << __EOT__
-
-${BASE_INDENT}Description:
-__EOT__
     local PRINTED_DESCRIPTIONS=()
     if [[ ${#ARGS_DESCRIPTION[@]} -gt 0 ]]; then
         PRINTED_DESCRIPTIONS=("${ARGS_DESCRIPTION[@]}")
@@ -158,9 +155,9 @@ __EOT__
     fi
     for PRINTED_DESCRIPTION in "${PRINTED_DESCRIPTIONS[@]}"
     do
-        echo "${BASE_INDENT}  ${PRINTED_DESCRIPTION}"
+        echo "${BASE_INDENT}${PRINTED_DESCRIPTION}"
     done
-    echo ""
+    echo
 }
 
 
@@ -436,7 +433,7 @@ function printVariableEnvironment() {
         echo "${VAR_NAME}"': ${'"${VAR_NAME}"'}'
         shift 1
     done
-    echo ""
+    echo
 }
 
 
@@ -451,7 +448,7 @@ function printVariableRequired() {
         echo "${PARAM_NAME}"': ${'"${VAR_NAME}"'}'
         shift 1
     done
-    echo ""
+    echo
 }
 
 function printVariableOptional() {
@@ -465,7 +462,7 @@ function printVariableOptional() {
         echo "${PARAM_NAME}"': ${'"${VAR_NAME}"'}'
         shift 1
     done
-    echo ""
+    echo
 }
 
 
@@ -479,7 +476,8 @@ function printVariableOptional() {
 
 printUsageFunctionTopPart "${NAMING}" "${AUTHOR}"
 
-
+# Print script description
+printScriptDescription
 
 # Print usage example
 printUsageExecutionExampleBase
@@ -497,12 +495,10 @@ printUsageExecutionExampleFlag ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
 if [[ ${#ARGS_OPTIONAL[@]} -gt 0 ]] || [[ ${#ARGS_FLAG[@]} -gt 0 ]]; then
     echo -n " ]"
 fi
-echo ""
+echo
+echo
 
 
-
-# Print script description
-printScriptDescription
 
 
 
@@ -528,7 +524,7 @@ if [[ ${#ARGS_FLAG[@]} -gt 0 ]]; then
 fi
 
 echo "${BASE_INDENT}  --debug : Enable debug mode"
-echo ""
+echo
 
 printUsageFunctionBottomPart
 
@@ -612,17 +608,17 @@ fi
 
 [[ -n "${REQUIRED_EOT+x}" ]] && { echo '__EOT__'; }
 
-
-#bash ~/Develop/bashscript/bash-script-starter/ScriptStarter.sh \
-#  -n ScriptStarter \
-#  -a xshoji \
-#  -d "This script generates a template of bash script tool." \
-#  -r naming,scriptName,"Script name." \
-#  -o author,author,"Script author.",anonymous \
-#  -o description,"Description","Description of this script. [ example: --description \"ScriptStarter's description here.\" ]" \
-#  -o required,"paramName\,sample\,description","Required parameter setting. [ example: --required id\,1001\,\"Primary id here.\" ]" \
-#  -o optional,"paramName\,sample\,description\,defaultValue(omittable)","Optional parameter setting. [ example: --option name\,xshoji\,\"User name here.\"\,defaultUser ]" \
-#  -o flag,"flagName\,description","Optional flag parameter setting. [ example: --flag dryRun\,\"Dry run mode.\" ]" \
-#  -o env,"variableName\,sample","Required environment variable. [ example: --env API_HOST\,example.com ]" \
-#  -f short,"Enable short parameter. [ example: --short ]" \
-#  -s > /tmp/test.sh
+# STARTER_URL=https://raw.githubusercontent.com/xshoji/bash-script-starter/master/ScriptStarter.sh
+# curl -sf ${STARTER_URL} |bash -s - \
+#   -n ScriptStarter \
+#   -a xshoji \
+#   -d "This script generates a template of bash script tool." \
+#   -r naming,scriptName,"Script name." \
+#   -o author,author,"Script author." \
+#   -o description,"Description","Description of this script. [ example: --description \"ScriptStarter's description here.\" ]" \
+#   -o required,"paramName\,sample\,description","Required parameter setting. [ example: --required id\,1001\,\"Primary id here.\" ]" \
+#   -o optional,"paramName\,sample\,description\,defaultValue(omittable)","Optional parameter setting. [ example: --option name\,xshoji\,\"User name here.\"\,defaultUser ]" \
+#   -o flag,"flagName\,description","Optional flag setting. [ example: --flag dryRun\,\"Dry run mode.\" ]" \
+#   -o env,"variableName\,sample","Required environment variable setting. [ example: --env API_HOST\,example.com ]" \
+#   -f short,"Enable short parameter. [ example: --short ]" \
+#   -s > /tmp/test.sh

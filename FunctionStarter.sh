@@ -7,11 +7,10 @@ cat << _EOT_
  FunctionStarter
 -------------------- author: xshoji
 
+This script generates a template of bash function.
+
 Usage:
   ./$(basename "$0") --naming scriptName [ --description Description --required paramName,sample,description --optional paramName,sample,description,defaultValue(omittable) --flag flagName,description ]
-
-Description:
-  This script generates a template of bash function.
 
 Required:
   -n, --naming scriptName : Script name.
@@ -340,7 +339,8 @@ fi
 echo "}"
 
 
-# bash ~/Develop/bashscript/bash-script-starter/ScriptStarter.sh \
+# STARTER_URL=https://raw.githubusercontent.com/xshoji/bash-script-starter/master/ScriptStarter.sh
+# curl -sf ${STARTER_URL} |bash -s - \
 #   -n FunctionStarter \
 #   -a xshoji \
 #   -d "This script generates a template of bash function." \
