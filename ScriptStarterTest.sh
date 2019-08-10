@@ -7,7 +7,7 @@ cat << _EOT_
  ScriptStarterTest
 ---------------------- author: xshoji
 
-This is ScriptStarterTest
+This is ScriptStarterTest.
 
 Usage:
   ./$(basename "$0") --scriptPath /path/to/ScriptStarter.sh
@@ -16,7 +16,9 @@ Required:
   -s, --scriptPath /path/to/ScriptStarter.sh : "/path/to/ScriptStarter.sh" means scriptPath
 
 Optional:
-  --debug : Enable debug mode
+
+Helper options:
+  --help, --debug
 
 _EOT_
   [[ "${1+x}" != "" ]] && { exit "${1}"; }
@@ -42,9 +44,10 @@ do
 done
 [[ -n "${HELP+x}" ]] && { usage 0; }
 # Check required parameters
-[[ -z "${SCRIPT_PATH+x}" ]] && { echo "[!] --scriptPath is required. "; INVALID_STATE="true"; }
+[[ -z "${SCRIPT_PATH+x}" ]] && { printf "\033[0;33m[!] --scriptPath is required.\033[0m\n"; INVALID_STATE="true"; }
 # Check invalid state and display usage
 [[ -n "${INVALID_STATE+x}" ]] && { usage; }
+
 
 
 #------------------------------------------
@@ -57,6 +60,7 @@ cat << __EOT__
 scriptPath: ${SCRIPT_PATH}
 
 __EOT__
+
 
 set +e
 COUNT=1
