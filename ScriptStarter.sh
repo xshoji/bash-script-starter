@@ -10,7 +10,7 @@ cat << _EOT_
 This script generates a template of bash script tool.
 
 Usage:
-  ./$(basename "$0") --naming scriptName [ --author author --description Description --required paramName,sample,description --required ... --optional paramName,sample,description,defaultValue(omittable) --optional ... --flag flagName,description --flag ... --env variableName,sample --env ... --short ]
+  ./$(basename "$0") --naming scriptName [ --author author --description Description --description ... --required paramName,sample,description --required ... --optional paramName,sample,description,defaultValue(omittable) --optional ... --flag flagName,description --flag ... --env variableName,sample --env ... --short ]
 
 Required:
   -n, --naming scriptName : Script name.
