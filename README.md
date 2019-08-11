@@ -2,6 +2,8 @@
 
 ScriptStarter provides a means to generate a pretty template of bash script.
 
+<img src="https://i.imgur.com/5M0Udbv.gif" width="80%" height="80%" style="border:0;box-shadow:0 0 0 0; " alt="Demo">
+
 ## Usage
 
 Set ScriptStarter url.
