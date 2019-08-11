@@ -505,7 +505,6 @@ if [[ ${#ARGS_OPTIONAL[@]} -gt 0 ]] || [[ ${#ARGS_FLAG[@]} -gt 0 ]]; then
     echo -n " ]"
 fi
 echo
-echo
 
 
 
@@ -513,23 +512,27 @@ echo
 
 # Print parameter description
 if [[ ${#ARGS_ENVIRONMENT[@]} -gt 0 ]]; then
+    echo
     echo "${BASE_INDENT}Environment variables: "
     printEnvironmentVariableDescription "${ARGS_ENVIRONMENT[@]}"
-    echo " "
 fi
 
 if [[ ${#ARGS_REQUIRED[@]} -gt 0 ]]; then
+    echo
     echo "${BASE_INDENT}Required:"
     printParameterDescriptionRequired "${ARGS_REQUIRED[@]}"
-    echo " "
 fi
 
-echo "${BASE_INDENT}Optional:"
-if [[ ${#ARGS_OPTIONAL[@]} -gt 0 ]]; then
-    printParameterDescriptionOptional ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"}
-fi
-if [[ ${#ARGS_FLAG[@]} -gt 0 ]]; then
-    printParameterDescriptionFlag ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
+
+if [[ ${#ARGS_OPTIONAL[@]} -gt 0 ]] || [[ ${#ARGS_FLAG[@]} -gt 0 ]]; then
+    echo
+    echo "${BASE_INDENT}Optional:"
+    if [[ ${#ARGS_OPTIONAL[@]} -gt 0 ]]; then
+        printParameterDescriptionOptional ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"}
+    fi
+    if [[ ${#ARGS_FLAG[@]} -gt 0 ]]; then
+        printParameterDescriptionFlag ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
+    fi
 fi
 
 echo
