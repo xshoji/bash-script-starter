@@ -483,56 +483,50 @@ function printVariableOptional() {
 # Main
 #==========================================
 
-printUsageFunctionTopPart "${NAMING}" "${AUTHOR}"
+# Check optional and flag parameter
+HAS_ENVIRONMENT="false"
+HAS_REQUIRED="false"
+HAS_OPTION="false"
+HAS_FLAG="false"
+HAS_OPTION_OR_FLAG="false"
+[[ ${#ARGS_ENVIRONMENT[@]} -gt 0 ]] && { HAS_ENVIRONMENT="true"; }
+[[ ${#ARGS_REQUIRED[@]} -gt 0 ]] && { HAS_REQUIRED="true"; }
+[[ ${#ARGS_OPTIONAL[@]} -gt 0 ]] && { HAS_OPTION="true"; }
+[[ ${#ARGS_FLAG[@]} -gt 0 ]] && { HAS_FLAG="true"; }
+{ [[ "${HAS_OPTION}" == "true" ]] || [[ "${HAS_FLAG}" == "true" ]]; } && { HAS_OPTION_OR_FLAG="true"; }
 
-# Print script description
+
+printUsageFunctionTopPart "${NAMING}" "${AUTHOR}"
 printScriptDescription
 
-# Print usage example
+# Print usage line
 printUsageExecutionExampleBase
-
 # - [Bash empty array expansion with `set -u` - Stack Overflow](https://stackoverflow.com/questions/7577052/bash-empty-array-expansion-with-set-u)
 printUsageExecutionExample ${ARGS_REQUIRED[@]+"${ARGS_REQUIRED[@]}"}
-
-if [[ ${#ARGS_OPTIONAL[@]} -gt 0 ]] || [[ ${#ARGS_FLAG[@]} -gt 0 ]]; then
-    echo -n " ["
-fi
-
+[[ "${HAS_OPTION_OR_FLAG}" == "true" ]] && { echo -n " ["; }
 printUsageExecutionExample ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"}
 printUsageExecutionExampleFlag ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
-
-if [[ ${#ARGS_OPTIONAL[@]} -gt 0 ]] || [[ ${#ARGS_FLAG[@]} -gt 0 ]]; then
-    echo -n " ]"
-fi
+[[ "${HAS_OPTION_OR_FLAG}" == "true" ]] && { echo -n " ]"; }
 echo
 
-
-
-
-
-# Print parameter description
-if [[ ${#ARGS_ENVIRONMENT[@]} -gt 0 ]]; then
+# Print parameter descriptions
+if [[ "${HAS_ENVIRONMENT}" == "true" ]]; then
     echo
     echo "${BASE_INDENT}Environment variables: "
     printEnvironmentVariableDescription "${ARGS_ENVIRONMENT[@]}"
 fi
 
-if [[ ${#ARGS_REQUIRED[@]} -gt 0 ]]; then
+if [[ "${HAS_REQUIRED}" == "true" ]]; then
     echo
     echo "${BASE_INDENT}Required:"
     printParameterDescriptionRequired "${ARGS_REQUIRED[@]}"
 fi
 
-
-if [[ ${#ARGS_OPTIONAL[@]} -gt 0 ]] || [[ ${#ARGS_FLAG[@]} -gt 0 ]]; then
+if [[ "${HAS_OPTION_OR_FLAG}" == "true" ]]; then
     echo
     echo "${BASE_INDENT}Optional:"
-    if [[ ${#ARGS_OPTIONAL[@]} -gt 0 ]]; then
-        printParameterDescriptionOptional ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"}
-    fi
-    if [[ ${#ARGS_FLAG[@]} -gt 0 ]]; then
-        printParameterDescriptionFlag ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
-    fi
+    [[ "${HAS_OPTION}" == "true" ]] && { printParameterDescriptionOptional ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"}; }
+    [[ "${HAS_FLAG}" == "true" ]] && { printParameterDescriptionFlag ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}; }
 fi
 
 echo
