@@ -42,6 +42,8 @@ Optional:
 bash-4.2#
 ```
 
+A sample of generated script [here](sample/GeneratedScriptSample.sh).
+
 ## Generate script
 
 ### Plain
