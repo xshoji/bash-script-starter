@@ -326,7 +326,7 @@ __EOT__
 
 function printColoredMessageFunction() {
 cat << __EOT__
-function printColored() { C=""; case "\${1}" in "Yellow") C="\033[0;33m";; "Green") C="\033[0;32m";; esac; printf "%b%s\033[0m\n" "\${C}" "\${2}"; }
+function printColored() { C=""; case "\${1}" in "Yellow") C="\033[0;33m";; "Green") C="\033[0;32m";; esac; printf "%b%b\033[0m" "\${C}" "\${2}"; }
 __EOT__
 }
 
@@ -386,7 +386,7 @@ function printCheckRequiredEnvironmentVariable() {
     do
         VAR_NAME=$(parseValue "${1}" 1)
         SAMPLE=$(parseValue "${1}" 2)
-        echo '[[ -z "${'"${VAR_NAME}"'+x}" ]] && { printColored Yellow "[!] export '"${VAR_NAME}"'='"${SAMPLE}"' is required."; INVALID_STATE="true"; }'
+        echo '[[ -z "${'"${VAR_NAME}"'+x}" ]] && { printColored Yellow "[!] export '"${VAR_NAME}"'='"${SAMPLE}"' is required.\n"; INVALID_STATE="true"; }'
         shift 1
     done
 }
@@ -400,7 +400,7 @@ function printCheckRequiredArgument() {
     do
         PARAM_NAME=$(parseValue "${1}" 1)
         VAR_NAME=$(toVarName "${PARAM_NAME}")
-        echo '[[ -z "${'"${VAR_NAME}"'+x}" ]] && { printColored Yellow "[!] --'"${PARAM_NAME}"' is required."; INVALID_STATE="true"; }'
+        echo '[[ -z "${'"${VAR_NAME}"'+x}" ]] && { printColored Yellow "[!] --'"${PARAM_NAME}"' is required.\n"; INVALID_STATE="true"; }'
         shift 1
     done
 }
