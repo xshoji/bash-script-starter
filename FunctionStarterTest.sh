@@ -7,22 +7,22 @@ cat << _EOT_
  FunctionStarterTest
 ------------------------ author: xshoji
 
-This is FunctionStarterTest
+This is FunctionStarterTest.
 
 Usage:
   ./$(basename "$0") --scriptPath /path/to/FunctionStarter.sh
 
 Required:
-  -s, --scriptPath /path/to/FunctionStarter.sh : "/path/to/FunctionStarter.sh" means scriptPath
+  -s, --scriptPath /path/to/FunctionStarter.sh : "/path/to/FunctionStarter.sh" means scriptPath.
 
-Optional:
-  --debug : Enable debug mode
+Helper options:
+  --help, --debug
 
 _EOT_
   [[ "${1+x}" != "" ]] && { exit "${1}"; }
   exit 1
 }
-
+function printColored() { C=""; case "${1}" in "Yellow") C="\033[0;33m";; "Green") C="\033[0;32m";; esac; printf "%b%b\033[0m" "${C}" "${2}"; }
 
 
 
@@ -42,7 +42,7 @@ do
 done
 [[ -n "${HELP+x}" ]] && { usage 0; }
 # Check required parameters
-[[ -z "${SCRIPT_PATH+x}" ]] && { echo "[!] --scriptPath is required. "; INVALID_STATE="true"; }
+[[ -z "${SCRIPT_PATH+x}" ]] && { printColored Yellow "[!] --scriptPath is required.\n"; INVALID_STATE="true"; }
 # Check invalid state and display usage
 [[ -n "${INVALID_STATE+x}" ]] && { usage; }
 
@@ -51,6 +51,17 @@ done
 #------------------------------------------
 # Main
 #------------------------------------------
+
+cat << __EOT__
+
+[ Required parameters ]
+scriptPath: ${SCRIPT_PATH}
+
+__EOT__
+
+
+
+
 set +e
 COUNT=1
 TEST_FILE=/tmp/test.sh
@@ -163,3 +174,11 @@ sed -i '' "s/^${FUNCTION_NAME}/${FUNCTION_NAME} --name Taro --country Japan --la
 sh ${TEST_FILE}
 sed -i '' "s/^${FUNCTION_NAME}/${FUNCTION_NAME} --name Taro --country Japan --language English --age 30  --isBrother --isDryRun/g" ${TEST_FILE}
 sh ${TEST_FILE}
+
+
+# STARTER_URL=https://raw.githubusercontent.com/xshoji/bash-script-starter/master/ScriptStarter.sh
+# curl -sf ${STARTER_URL} |bash -s - \
+#   -n FunctionStarterTest \
+#   -a xshoji \
+#   -r scriptPath,"/path/to/FunctionStarter.sh" \
+#   -s > /tmp/test.sh; open /tmp/test.sh
