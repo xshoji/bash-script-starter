@@ -22,7 +22,7 @@ _EOT_
   [[ "${1+x}" != "" ]] && { exit "${1}"; }
   exit 1
 }
-function printColored() { C=""; case "${1}" in "Yellow") C="\033[0;33m";; "Green") C="\033[0;32m";; esac; printf "%s%s\033[0m\n" "${C}" "${2}"; }
+function printColored() { C=""; case "${1}" in "Yellow") C="\033[0;33m";; "Green") C="\033[0;32m";; esac; printf "%b%b\033[0m" "${C}" "${2}"; }
 
 
 
@@ -42,7 +42,7 @@ do
 done
 [[ -n "${HELP+x}" ]] && { usage 0; }
 # Check required parameters
-[[ -z "${SCRIPT_PATH+x}" ]] && { printColored Yellow "[!] --scriptPath is required."; INVALID_STATE="true"; }
+[[ -z "${SCRIPT_PATH+x}" ]] && { printColored Yellow "[!] --scriptPath is required.\n"; INVALID_STATE="true"; }
 # Check invalid state and display usage
 [[ -n "${INVALID_STATE+x}" ]] && { usage; }
 
@@ -58,7 +58,6 @@ cat << __EOT__
 scriptPath: ${SCRIPT_PATH}
 
 __EOT__
-
 
 
 
@@ -217,15 +216,11 @@ COUNT=$(( COUNT + 1 ))
 chmod 777 ${GENERATED_SCRIPT_FILE_PATH}
 ${GENERATED_SCRIPT_FILE_PATH}
 if [[ "$?" != "1" ]]; then
-  echo "==================="
-  echo "====== ERROR : Script status != 1 ======"
-  echo "==================="
+  printColored Yellow "====== ERROR : Script status != 1 ======\n"
 fi
 ${GENERATED_SCRIPT_FILE_PATH} -x xxx --help
 if [[ "$?" != "0" ]]; then
-  echo "==================="
-  echo "====== ERROR : Script --help status != 0 ======"
-  echo "==================="
+  printColored Yellow "====== ERROR : Script --help status != 0 ======\n"
 fi
 
 echo;echo;echo;
@@ -236,51 +231,37 @@ COUNT=$(( COUNT + 1 ))
 chmod 777 ${GENERATED_SCRIPT_FILE_PATH}
 ${GENERATED_SCRIPT_FILE_PATH}
 if [[ "$?" != "1" ]]; then
-  echo "==================="
-  echo "====== ERROR : Script status != 1 ======"
-  echo "==================="
+  printColored Yellow "====== ERROR : Script status != 1 ======\n"
 fi
 ${GENERATED_SCRIPT_FILE_PATH} -h
 if [[ "$?" != "0" ]]; then
-  echo "==================="
-  echo "====== ERROR : Script --help status != 0 ======"
-  echo "==================="
+  printColored Yellow "====== ERROR : Script --help status != 0 ======\n"
 fi
 ${GENERATED_SCRIPT_FILE_PATH} --help
 if [[ "$?" != "0" ]]; then
-  echo "==================="
-  echo "====== ERROR : Script --help status != 0 ======"
-  echo "==================="
+  printColored Yellow "====== ERROR : Script --help status != 0 ======\n"
 fi
 ./${SCRIPT_PATH} -n test -a user -s -r aaa,aaa -o bbb,bbb -r hello,hello > ${GENERATED_SCRIPT_FILE_PATH}
 chmod 777 ${GENERATED_SCRIPT_FILE_PATH}
 ${GENERATED_SCRIPT_FILE_PATH}
 if [[ "$?" != "1" ]]; then
-  echo "==================="
-  echo "====== ERROR : Script status != 1 ======"
-  echo "==================="
+  printColored Yellow "====== ERROR : Script status != 1 ======\n"
 fi
 ${GENERATED_SCRIPT_FILE_PATH} -a aaa -h hhh
 ${GENERATED_SCRIPT_FILE_PATH} --help
 if [[ "$?" != "0" ]]; then
-  echo "==================="
-  echo "====== ERROR : Script --help status != 0 ======"
-  echo "==================="
+  printColored Yellow "====== ERROR : Script --help status != 0 ======\n"
 fi
 ./${SCRIPT_PATH} -n test -a user -s -r aaa,aaa -o bbb,bbb -f hello,hello > ${GENERATED_SCRIPT_FILE_PATH}
 chmod 777 ${GENERATED_SCRIPT_FILE_PATH}
 ${GENERATED_SCRIPT_FILE_PATH}
 if [[ "$?" != "1" ]]; then
-  echo "==================="
-  echo "====== ERROR : Script status != 1 ======"
-  echo "==================="
+  printColored Yellow "====== ERROR : Script status != 1 ======\n"
 fi
 ${GENERATED_SCRIPT_FILE_PATH} -a aaa -h
 ${GENERATED_SCRIPT_FILE_PATH} --help
 if [[ "$?" != "0" ]]; then
-  echo "==================="
-  echo "====== ERROR : Script --help status != 0 ======"
-  echo "==================="
+  printColored Yellow "====== ERROR : Script --help status != 0 ======\n"
 fi
 
 echo;echo;echo;
@@ -298,4 +279,4 @@ ${GENERATED_SCRIPT_FILE_PATH} -a a -o b -d ddd
 #   -n ScriptStarterTest \
 #   -a xshoji \
 #   -r scriptPath,"/path/to/ScriptStarter.sh" \
-#   -s > /tmp/test.sh
+#   -s > /tmp/test.sh; open /tmp/test.sh

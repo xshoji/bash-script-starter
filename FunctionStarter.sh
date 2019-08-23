@@ -26,7 +26,7 @@ _EOT_
   [[ "${1+x}" != "" ]] && { exit "${1}"; }
   exit 1
 }
-function printColored() { C=""; case "${1}" in "Yellow") C="\033[0;33m";; "Green") C="\033[0;32m";; esac; printf "%s%s\033[0m\n" "${C}" "${2}"; }
+function printColored() { C=""; case "${1}" in "Yellow") C="\033[0;33m";; "Green") C="\033[0;32m";; esac; printf "%b%b\033[0m" "${C}" "${2}"; }
 
 
 
@@ -49,7 +49,7 @@ do
 done
 [[ -n "${HELP+x}" ]] && { usage 0; }
 # Check required parameters
-[[ -z "${NAMING+x}" ]] && { printColored Yellow "[!] --naming is required."; INVALID_STATE="true"; }
+[[ -z "${NAMING+x}" ]] && { printColored Yellow "[!] --naming is required.\n"; INVALID_STATE="true"; }
 # Check invalid state and display usage
 [[ -n "${INVALID_STATE+x}" ]] && { usage; }
 # Initialize optional variables
@@ -349,4 +349,5 @@ echo "}"
 #   -o required,"paramName\,sample\,description","Required parameter setting. [ example: --required id\,1001\,\"Primary id here.\" ]" \
 #   -o optional,"paramName\,sample\,description\,defaultValue(omittable)","Optional parameter setting. [ example: --option name\,xshoji\,\"User name here.\"\,defaultUser ]" \
 #   -o flag,"flagName\,description","Optional flag parameter setting. [ example: --flag dryRun\,\"Dry run mode.\" ]" \
-#   -s > /tmp/test.sh
+#   -s > /tmp/test.sh; open /tmp/test.sh
+

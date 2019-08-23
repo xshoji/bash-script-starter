@@ -22,7 +22,7 @@ _EOT_
   [[ "${1+x}" != "" ]] && { exit "${1}"; }
   exit 1
 }
-function printColored() { C=""; case "${1}" in "Yellow") C="\033[0;33m";; "Green") C="\033[0;32m";; esac; printf "%s%s\033[0m\n" "${C}" "${2}"; }
+function printColored() { C=""; case "${1}" in "Yellow") C="\033[0;33m";; "Green") C="\033[0;32m";; esac; printf "%b%b\033[0m" "${C}" "${2}"; }
 
 
 
@@ -42,7 +42,7 @@ do
 done
 [[ -n "${HELP+x}" ]] && { usage 0; }
 # Check required parameters
-[[ -z "${SCRIPT_PATH+x}" ]] && { printColored Yellow "[!] --scriptPath is required."; INVALID_STATE="true"; }
+[[ -z "${SCRIPT_PATH+x}" ]] && { printColored Yellow "[!] --scriptPath is required.\n"; INVALID_STATE="true"; }
 # Check invalid state and display usage
 [[ -n "${INVALID_STATE+x}" ]] && { usage; }
 
@@ -58,6 +58,7 @@ cat << __EOT__
 scriptPath: ${SCRIPT_PATH}
 
 __EOT__
+
 
 
 
@@ -180,4 +181,4 @@ sh ${TEST_FILE}
 #   -n FunctionStarterTest \
 #   -a xshoji \
 #   -r scriptPath,"/path/to/FunctionStarter.sh" \
-#   -s > /tmp/test.sh
+#   -s > /tmp/test.sh; open /tmp/test.sh

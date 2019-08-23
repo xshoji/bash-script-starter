@@ -31,7 +31,7 @@ _EOT_
   [[ "${1+x}" != "" ]] && { exit "${1}"; }
   exit 1
 }
-
+function printColored() { C=""; case "${1}" in "Yellow") C="\033[0;33m";; "Green") C="\033[0;32m";; esac; printf "%b%b\033[0m" "${C}" "${2}"; }
 
 
 
@@ -66,7 +66,7 @@ do
 done
 [[ -n "${HELP+x}" ]] && { usage 0; }
 # Check required parameters
-[[ -z "${NAMING+x}" ]] && { printf "\033[0;33m[!] --naming is required.\033[0m\n"; INVALID_STATE="true"; }
+[[ -z "${NAMING+x}" ]] && { printColored Yellow "[!] --naming is required.\n"; INVALID_STATE="true"; }
 # Check invalid state and display usage
 [[ -n "${INVALID_STATE+x}" ]] && { usage; }
 # Initialize optional variables
@@ -634,4 +634,4 @@ fi
 #   -o flag,"flagName\,description","Optional flag setting. [ example: --flag dryRun\,\"Dry run mode.\" ]" \
 #   -o env,"variableName\,sample","Required environment variable setting. [ example: --env API_HOST\,example.com ]" \
 #   -f short,"Enable short parameter. [ example: --short ]" \
-#   -s > /tmp/test.sh
+#   -s > /tmp/test.sh; open /tmp/test.sh
