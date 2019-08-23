@@ -22,8 +22,7 @@ _EOT_
   [[ "${1+x}" != "" ]] && { exit "${1}"; }
   exit 1
 }
-function printColored() { C=""; case "${1}" in "Yellow") C="\033[0;33m";; "Green") C="\033[0;32m";; esac; printf "${C}${2}\033[0m\n"; }
-
+function printColored() { C=""; case "${1}" in "Yellow") C="\033[0;33m";; "Green") C="\033[0;32m";; esac; printf "%s%s\033[0m\n" "${C}" "${2}"; }
 
 
 
@@ -59,6 +58,7 @@ cat << __EOT__
 scriptPath: ${SCRIPT_PATH}
 
 __EOT__
+
 
 
 set +e

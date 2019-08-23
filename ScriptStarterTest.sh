@@ -26,7 +26,6 @@ function printColored() { C=""; case "${1}" in "Yellow") C="\033[0;33m";; "Green
 
 
 
-
 #------------------------------------------
 # Preparation
 #------------------------------------------
@@ -59,6 +58,7 @@ cat << __EOT__
 scriptPath: ${SCRIPT_PATH}
 
 __EOT__
+
 
 
 
