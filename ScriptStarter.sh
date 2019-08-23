@@ -230,7 +230,7 @@ function printParameterDescriptionRequired() {
         DESCRIPTION=$(parseValue "${1}" 3)
         PARAM_NAME_SHORT=$(cut -c 1 <<<"${PARAM_NAME}")
         [[ "${SAMPLE}" == "" ]] && { SAMPLE=${PARAM_NAME}; }
-        [[ "${DESCRIPTION}" == "" ]] && { DESCRIPTION="\"${SAMPLE}\" means ${PARAM_NAME}"; }
+        [[ "${DESCRIPTION}" == "" ]] && { DESCRIPTION="\"${SAMPLE}\" means ${PARAM_NAME}."; }
         IS_USED_SHORT_PARAM=$(grep "${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
         LINE=$(echo -n "--${PARAM_NAME}")
         if [[ "${SHORT}" == "true" ]] && [[ "${IS_USED_SHORT_PARAM}" == "" ]]; then
@@ -266,7 +266,7 @@ function printParameterDescriptionOptional() {
         DEFAULT=$(parseValue "${1}" 4)
         PARAM_NAME_SHORT=$(cut -c 1 <<<"${PARAM_NAME}")
         [[ "${SAMPLE}" == "" ]] && { SAMPLE="${PARAM_NAME}"; }
-        [[ "${DESCRIPTION}" == "" ]] && { DESCRIPTION="\"${SAMPLE}\" means ${PARAM_NAME}"; }
+        [[ "${DESCRIPTION}" == "" ]] && { DESCRIPTION="\"${SAMPLE}\" means ${PARAM_NAME}."; }
         IS_USED_SHORT_PARAM=$(grep "${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
         LINE=$(echo -n "--${PARAM_NAME}")
         if [[ "${SHORT}" == "true" ]] && [[ "${IS_USED_SHORT_PARAM}" == "" ]]; then
@@ -298,7 +298,7 @@ function printParameterDescriptionFlag() {
         PARAM_NAME=$(parseValue "${1}" 1)
         PARAM_NAME_SHORT=$(cut -c 1 <<<"${PARAM_NAME}")
         DESCRIPTION=$(parseValue "${1}" 2)
-        [[ "${DESCRIPTION}" == "" ]] && { DESCRIPTION="Enable ${PARAM_NAME} flag"; }
+        [[ "${DESCRIPTION}" == "" ]] && { DESCRIPTION="Enable ${PARAM_NAME} flag."; }
         IS_USED_SHORT_PARAM=$(grep "${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
         LINE=$(echo -n "--${PARAM_NAME}")
         if [[ "${SHORT}" == "true" ]] && [[ "${IS_USED_SHORT_PARAM}" == "" ]]; then
@@ -321,6 +321,12 @@ _EOT_
   [[ "\${1+x}" != "" ]] && { exit "\${1}"; }
   exit 1
 }
+__EOT__
+}
+
+function printColoredMessageFunction() {
+cat << __EOT__
+function printColored() { C=""; case "\${1}" in "Yellow") C="\033[0;33m";; "Green") C="\033[0;32m";; esac; printf "\${C}\${2}\033[0m\n"; }
 
 __EOT__
 }
@@ -381,7 +387,7 @@ function printCheckRequiredEnvironmentVariable() {
     do
         VAR_NAME=$(parseValue "${1}" 1)
         SAMPLE=$(parseValue "${1}" 2)
-        echo '[[ -z "${'"${VAR_NAME}"'+x}" ]] && { printf "'"${ERROR_COLOR}"'[!] export '"${VAR_NAME}"'='"${SAMPLE}"' is required.'"${CLEAR_COLOR}"'\n"; INVALID_STATE="true"; }'
+        echo '[[ -z "${'"${VAR_NAME}"'+x}" ]] && { printColored Yellow "[!] export '"${VAR_NAME}"'='"${SAMPLE}"' is required."; INVALID_STATE="true"; }'
         shift 1
     done
 }
@@ -395,7 +401,7 @@ function printCheckRequiredArgument() {
     do
         PARAM_NAME=$(parseValue "${1}" 1)
         VAR_NAME=$(toVarName "${PARAM_NAME}")
-        echo '[[ -z "${'"${VAR_NAME}"'+x}" ]] && { printf "'"${ERROR_COLOR}"'[!] --'"${PARAM_NAME}"' is required.'"${CLEAR_COLOR}"'\n"; INVALID_STATE="true"; }'
+        echo '[[ -z "${'"${VAR_NAME}"'+x}" ]] && { printColored Yellow "[!] --'"${PARAM_NAME}"' is required."; INVALID_STATE="true"; }'
         shift 1
     done
 }
@@ -535,7 +541,7 @@ echo "${BASE_INDENT}  --help, --debug"
 echo
 
 printUsageFunctionBottomPart
-
+printColoredMessageFunction
 
 cat << "__EOT__"
 
