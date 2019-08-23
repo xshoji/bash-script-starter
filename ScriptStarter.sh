@@ -326,8 +326,7 @@ __EOT__
 
 function printColoredMessageFunction() {
 cat << __EOT__
-function printColored() { C=""; case "\${1}" in "Yellow") C="\033[0;33m";; "Green") C="\033[0;32m";; esac; printf "\${C}\${2}\033[0m\n"; }
-
+function printColored() { C=""; case "\${1}" in "Yellow") C="\033[0;33m";; "Green") C="\033[0;32m";; esac; printf "%s%s\033[0m\n" "\${C}" "\${2}"; }
 __EOT__
 }
 

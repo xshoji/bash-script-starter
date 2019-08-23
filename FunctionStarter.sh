@@ -26,7 +26,7 @@ _EOT_
   [[ "${1+x}" != "" ]] && { exit "${1}"; }
   exit 1
 }
-
+function printColored() { C=""; case "${1}" in "Yellow") C="\033[0;33m";; "Green") C="\033[0;32m";; esac; printf "${C}${2}\033[0m\n"; }
 
 
 
@@ -49,7 +49,7 @@ do
 done
 [[ -n "${HELP+x}" ]] && { usage 0; }
 # Check required parameters
-[[ -z "${NAMING+x}" ]] && { echo "[!] --naming is required. "; INVALID_STATE="true"; }
+[[ -z "${NAMING+x}" ]] && { printColored Yellow "[!] --naming is required."; INVALID_STATE="true"; }
 # Check invalid state and display usage
 [[ -n "${INVALID_STATE+x}" ]] && { usage; }
 # Initialize optional variables
