@@ -22,7 +22,7 @@ _EOT_
   [[ "${1+x}" != "" ]] && { exit "${1}"; }
   exit 1
 }
-function printColored() { C=""; case "${1}" in "Yellow") C="\033[0;33m";; "Green") C="\033[0;32m";; esac; printf "%b%b\033[0m" "${C}" "${2}"; }
+function printColored() { local B="\033[0;"; case "${1}" in "yellow") C="33m";; "green") C="32m";; "red") C="31m";; "blue") C="34m";; esac; printf "%b%b\033[0m" "${B}${C}" "${2}"; }
 
 
 
@@ -42,7 +42,7 @@ do
 done
 [[ -n "${HELP+x}" ]] && { usage 0; }
 # Check required parameters
-[[ -z "${SCRIPT_PATH+x}" ]] && { printColored Yellow "[!] --scriptPath is required.\n"; INVALID_STATE="true"; }
+[[ -z "${SCRIPT_PATH+x}" ]] && { printColored yellow "[!] --scriptPath is required.\n"; INVALID_STATE="true"; }
 # Check invalid state and display usage
 [[ -n "${INVALID_STATE+x}" ]] && { usage; }
 

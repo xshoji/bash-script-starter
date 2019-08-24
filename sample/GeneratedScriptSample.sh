@@ -33,7 +33,7 @@ _EOT_
   [[ "${1+x}" != "" ]] && { exit "${1}"; }
   exit 1
 }
-function printColored() { C=""; case "${1}" in "Yellow") C="\033[0;33m";; "Green") C="\033[0;32m";; esac; printf "%b%b\033[0m" "${C}" "${2}"; }
+function printColored() { local B="\033[0;"; case "${1}" in "yellow") C="33m";; "green") C="32m";; "red") C="31m";; "blue") C="34m";; esac; printf "%b%b\033[0m" "${B}${C}" "${2}"; }
 
 
 
@@ -58,11 +58,11 @@ do
 done
 [[ -n "${HELP+x}" ]] && { usage 0; }
 # Check environment variables
-[[ -z "${ENV_VAR1+x}" ]] && { printColored Yellow "[!] export ENV_VAR1=xxxxx is required.\n"; INVALID_STATE="true"; }
-[[ -z "${ENV_VAR2+x}" ]] && { printColored Yellow "[!] export ENV_VAR2=xxxxx is required.\n"; INVALID_STATE="true"; }
+[[ -z "${ENV_VAR1+x}" ]] && { printColored yellow "[!] export ENV_VAR1=xxxxx is required.\n"; INVALID_STATE="true"; }
+[[ -z "${ENV_VAR2+x}" ]] && { printColored yellow "[!] export ENV_VAR2=xxxxx is required.\n"; INVALID_STATE="true"; }
 # Check required parameters
-[[ -z "${ID+x}" ]] && { printColored Yellow "[!] --id is required.\n"; INVALID_STATE="true"; }
-[[ -z "${TYPE+x}" ]] && { printColored Yellow "[!] --type is required.\n"; INVALID_STATE="true"; }
+[[ -z "${ID+x}" ]] && { printColored yellow "[!] --id is required.\n"; INVALID_STATE="true"; }
+[[ -z "${TYPE+x}" ]] && { printColored yellow "[!] --type is required.\n"; INVALID_STATE="true"; }
 # Check invalid state and display usage
 [[ -n "${INVALID_STATE+x}" ]] && { usage; }
 # Initialize optional variables

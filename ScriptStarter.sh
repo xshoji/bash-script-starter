@@ -31,7 +31,7 @@ _EOT_
   [[ "${1+x}" != "" ]] && { exit "${1}"; }
   exit 1
 }
-function printColored() { C=""; case "${1}" in "Yellow") C="\033[0;33m";; "Green") C="\033[0;32m";; esac; printf "%b%b\033[0m" "${C}" "${2}"; }
+function printColored() { local C="\033[0;"; case "${1}" in "yellow") C="${C}33m";; "Green") C="${C}32m";; "red") C="${C}31m";; esac; printf "%b%b\033[0m" "${C}" "${2}"; }
 
 
 
@@ -66,7 +66,7 @@ do
 done
 [[ -n "${HELP+x}" ]] && { usage 0; }
 # Check required parameters
-[[ -z "${NAMING+x}" ]] && { printColored Yellow "[!] --naming is required.\n"; INVALID_STATE="true"; }
+[[ -z "${NAMING+x}" ]] && { printColored yellow "[!] --naming is required.\n"; INVALID_STATE="true"; }
 # Check invalid state and display usage
 [[ -n "${INVALID_STATE+x}" ]] && { usage; }
 # Initialize optional variables
@@ -78,8 +78,6 @@ done
 # Define constant variable
 PROVISIONAL_STRING=$(openssl rand -hex 12 | fold -w 12 | head -1)
 BASE_INDENT=""
-ERROR_COLOR='\033[0;33m' # yellow
-CLEAR_COLOR='\033[0m'
 
 #==========================================
 # Functions
@@ -326,7 +324,7 @@ __EOT__
 
 function printColoredMessageFunction() {
 cat << __EOT__
-function printColored() { C=""; case "\${1}" in "Yellow") C="\033[0;33m";; "Green") C="\033[0;32m";; esac; printf "%b%b\033[0m" "\${C}" "\${2}"; }
+function printColored() { local B="\033[0;"; case "\${1}" in "yellow") C="33m";; "green") C="32m";; "red") C="31m";; "blue") C="34m";; esac; printf "%b%b\033[0m" "\${B}\${C}" "\${2}"; }
 __EOT__
 }
 
@@ -386,7 +384,7 @@ function printCheckRequiredEnvironmentVariable() {
     do
         VAR_NAME=$(parseValue "${1}" 1)
         SAMPLE=$(parseValue "${1}" 2)
-        echo '[[ -z "${'"${VAR_NAME}"'+x}" ]] && { printColored Yellow "[!] export '"${VAR_NAME}"'='"${SAMPLE}"' is required.\n"; INVALID_STATE="true"; }'
+        echo '[[ -z "${'"${VAR_NAME}"'+x}" ]] && { printColored yellow "[!] export '"${VAR_NAME}"'='"${SAMPLE}"' is required.\n"; INVALID_STATE="true"; }'
         shift 1
     done
 }
@@ -400,7 +398,7 @@ function printCheckRequiredArgument() {
     do
         PARAM_NAME=$(parseValue "${1}" 1)
         VAR_NAME=$(toVarName "${PARAM_NAME}")
-        echo '[[ -z "${'"${VAR_NAME}"'+x}" ]] && { printColored Yellow "[!] --'"${PARAM_NAME}"' is required.\n"; INVALID_STATE="true"; }'
+        echo '[[ -z "${'"${VAR_NAME}"'+x}" ]] && { printColored yellow "[!] --'"${PARAM_NAME}"' is required.\n"; INVALID_STATE="true"; }'
         shift 1
     done
 }
