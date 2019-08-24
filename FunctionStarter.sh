@@ -57,12 +57,24 @@ done
 
 
 
-
 FUNCTION_NAME="${NAMING}"
+
+# Define constant variable
+PROVISIONAL_STRING=$(openssl rand -hex 12 | fold -w 12 | head -1)
 
 #==========================================
 # Functions
 #==========================================
+
+
+function parseValue() {
+  echo "${1}" |sed "s/\\\,/${PROVISIONAL_STRING}/g" |awk -F',' '{print $'"${2}"'}' |sed "s/${PROVISIONAL_STRING}/,/g"
+}
+
+function toVarName() {
+  local PARAM_NAME="${1}"
+  echo "${PARAM_NAME}" | perl -pe 's/(?:^|_|-)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}'
+}
 
 function printFunctionDocumentBase() {
 
@@ -81,12 +93,13 @@ function printFunctionDocumentBase() {
 
 
 function printUsageExecutionExample() {
-
+    local PARAM_NAME
+    local SAMPLE
     # Add required parameters
     for ARG in "$@"
     do
-        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
-        local SAMPLE=$(awk -F',' '{print $2}' <<<${1})
+        PARAM_NAME=$(parseValue "${1}" 1)
+        SAMPLE=$(parseValue "${1}" 2)
         echo -n ' '"--"${PARAM_NAME}" ${SAMPLE}"
         shift 1
     done
@@ -95,11 +108,11 @@ function printUsageExecutionExample() {
 
 
 function printUsageExecutionExampleFlag() {
-
+    local PARAM_NAME
     # Add required parameters
     for ARG in "$@"
     do
-        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
+        PARAM_NAME=$(parseValue "${1}" 1)
         echo -n ' '"--"${PARAM_NAME}""
         shift 1
     done
@@ -109,21 +122,26 @@ function printUsageExecutionExampleFlag() {
 
 
 function printParameterDescription() {
+    local PARAM_NAME
+    local SAMPLE
+    local DESCRIPTION
+    local PARAM_NAME_SHORT
+    local IS_USED_SHORT_PARAM
     for ARG in "$@"
     do
         # - [csv - Printing column separated by comma using Awk command line - Stack Overflow](https://stackoverflow.com/questions/26842504/printing-column-separated-by-comma-using-awk-command-line)
-        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
-        local SAMPLE=$(awk -F',' '{print $2}' <<<${1})
-        local DESCRIPTION=$(awk -F',' '{print $3}' <<<${1})
-        local PARAM_NAME_SHORT=$(cut -c 1 <<<"${PARAM_NAME}")
+        PARAM_NAME=$(parseValue "${1}" 1)
+        SAMPLE=$(parseValue "${1}" 2)
+        DESCRIPTION=$(parseValue "${1}" 3)
+        PARAM_NAME_SHORT=$(cut -c 1 <<<"${PARAM_NAME}")
         [ "${SAMPLE}" == "" ] && { SAMPLE="${PARAM_NAME}"; }
-        [ "${DESCRIPTION}" == "" ] && { DESCRIPTION="${SAMPLE} is specified as "${PARAM_NAME}""; }
-        local IS_USED_SHORT_PARAM=$(grep "${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
+        [ "${DESCRIPTION}" == "" ] && { DESCRIPTION="${SAMPLE} means "${PARAM_NAME}"."; }
+        IS_USED_SHORT_PARAM=$(grep "${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
         echo -n "#   --"${PARAM_NAME}""
-        if [ "${SHORT}" == "true" ] && [ "${IS_USED_SHORT_PARAM}" == "" ]; then
-            ARGS_SHORT+=("${PARAM_NAME_SHORT}")
-            echo -n ",-${PARAM_NAME_SHORT}"
-        fi
+        # if [ "${SHORT}" == "true" ] && [ "${IS_USED_SHORT_PARAM}" == "" ]; then
+        #     ARGS_SHORT+=("${PARAM_NAME_SHORT}")
+        #     echo -n ",-${PARAM_NAME_SHORT}"
+        # fi
         echo " ${SAMPLE} : ${DESCRIPTION}"
         shift 1
     done
@@ -132,18 +150,22 @@ function printParameterDescription() {
 
 
 function printParameterDescriptionFlag() {
+    local PARAM_NAME
+    local PARAM_NAME_SHORT
+    local DESCRIPTION
+    local IS_USED_SHORT_PARAM
     for ARG in "$@"
     do
-        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
-        local PARAM_NAME_SHORT=$(cut -c 1 <<<"${PARAM_NAME}")
-        local DESCRIPTION=$(awk -F',' '{print $2}' <<<${1})
-        [ "${DESCRIPTION}" == "" ] && { DESCRIPTION="Enable "${PARAM_NAME}" flag"; }
-        local IS_USED_SHORT_PARAM=$(grep "${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
+        PARAM_NAME=$(parseValue "${1}" 1)
+        PARAM_NAME_SHORT=$(parseValue "${1}" 2)
+        DESCRIPTION=$(parseValue "${1}" 3)
+        [ "${DESCRIPTION}" == "" ] && { DESCRIPTION="Enable "${PARAM_NAME}" flag."; }
+        IS_USED_SHORT_PARAM=$(grep "${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
         echo -n "#   --"${PARAM_NAME}""
-        if [ "${SHORT}" == "true" ] && [ "${IS_USED_SHORT_PARAM}" == "" ]; then
-            ARGS_SHORT+=("${PARAM_NAME_SHORT}")
-            echo -n ",-${PARAM_NAME_SHORT}"
-        fi
+        # if [ "${SHORT}" == "true" ] && [ "${IS_USED_SHORT_PARAM}" == "" ]; then
+        #     ARGS_SHORT+=("${PARAM_NAME_SHORT}")
+        #     echo -n ",-${PARAM_NAME_SHORT}"
+        # fi
         echo " : ${DESCRIPTION}"
         shift 1
     done
@@ -160,27 +182,34 @@ function printFunctionTopPart() {
 }
 
 function printLocalDeclarationArgument() {
+    local PARAM_NAME
+    local VAR_NAME
     for ARG in "$@"
     do
-        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
-        local VAR_NAME=$(echo "${PARAM_NAME}" | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
+        PARAM_NAME=$(parseValue "${1}" 1)
+        VAR_NAME=$(toVarName "${PARAM_NAME}")
         echo -n '    local '"${VAR_NAME}"'="";'
         shift 1
     done
 }
 
 function printParseArgument() {
+    local PARAM_NAME
+    local PARAM_NAME_SHORT
+    local VAR_NAME
+    local CONDITION
+    local IS_USED_SHORT_PARAM=$(grep "1${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
     for ARG in "$@"
     do
-        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
-        local PARAM_NAME_SHORT=$(cut -c 1 <<<${1})
-        local VAR_NAME=$(echo "${PARAM_NAME}" | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
-        local CONDITION='[ "${_ARG}" == "--'""${PARAM_NAME}""'" ]'
-        local IS_USED_SHORT_PARAM=$(grep "1${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
-        if [ "${SHORT}" == "true" ] && [ "${IS_USED_SHORT_PARAM}" == "" ]; then
-            ARGS_SHORT+=("1${PARAM_NAME_SHORT}")
-            CONDITION='('"${CONDITION}"' || [ "${_ARG}" == "-'"${PARAM_NAME_SHORT}"'" ])'
-        fi
+        PARAM_NAME=$(parseValue "${1}" 1)
+        PARAM_NAME_SHORT=$(cut -c 1 <<<${1})
+        VAR_NAME=$(toVarName "${PARAM_NAME}")
+        CONDITION='[ "${_ARG}" == "--'""${PARAM_NAME}""'" ]'
+        IS_USED_SHORT_PARAM=$(grep "1${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
+        # if [ "${SHORT}" == "true" ] && [ "${IS_USED_SHORT_PARAM}" == "" ]; then
+        #     ARGS_SHORT+=("1${PARAM_NAME_SHORT}")
+        #     CONDITION='('"${CONDITION}"' || [ "${_ARG}" == "-'"${PARAM_NAME_SHORT}"'" ])'
+        # fi
         echo -n "${CONDITION}"' && { shift 1; '"${VAR_NAME}"'="${1}"; _SHIFT="false"; }; '
         shift 1
     done
@@ -188,17 +217,21 @@ function printParseArgument() {
 
 
 function printParseArgumentFlag() {
+    local PARAM_NAME
+    local PARAM_NAME_SHORT
+    local VAR_NAME
+    local CONDITION
     for ARG in "$@"
     do
-        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
-        local PARAM_NAME_SHORT=$(cut -c 1 <<<${1})
-        local VAR_NAME=$(echo "${PARAM_NAME}" | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
-        local CONDITION='[ "${_ARG}" == "--'""${PARAM_NAME}""'" ]'
-        local IS_USED_SHORT_PARAM=$(grep "1${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
-        if [ "${SHORT}" == "true" ] && [ "${IS_USED_SHORT_PARAM}" == "" ]; then
-            ARGS_SHORT+=("1${PARAM_NAME_SHORT}")
-            CONDITION='('"${CONDITION}"' || [ "${_ARG}" == "-'"${PARAM_NAME_SHORT}"'" ])'
-        fi
+        PARAM_NAME=$(parseValue "${1}" 1)
+        PARAM_NAME_SHORT=$(cut -c 1 <<<${1})
+        VAR_NAME=$(toVarName "${PARAM_NAME}")
+        CONDITION='[ "${_ARG}" == "--'""${PARAM_NAME}""'" ]'
+        IS_USED_SHORT_PARAM=$(grep "1${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
+        # if [ "${SHORT}" == "true" ] && [ "${IS_USED_SHORT_PARAM}" == "" ]; then
+        #     ARGS_SHORT+=("1${PARAM_NAME_SHORT}")
+        #     CONDITION='('"${CONDITION}"' || [ "${_ARG}" == "-'"${PARAM_NAME_SHORT}"'" ])'
+        # fi
         echo -n "${CONDITION}"' && { shift 1; '"${VAR_NAME}"'="true"; _SHIFT="false"; }; '
         shift 1
     done
@@ -207,10 +240,12 @@ function printParseArgumentFlag() {
 
 
 function printCheckRequiredArgument() {
+    local PARAM_NAME
+    local VAR_NAME
     for ARG in "$@"
     do
-        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
-        local VAR_NAME=$(echo "${PARAM_NAME}" | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
+        PARAM_NAME=$(parseValue "${1}" 1)
+        VAR_NAME=$(toVarName "${PARAM_NAME}")
         echo '    [ "${'"${VAR_NAME}"'}" == "" ] && { echo "[!] '${FUNCTION_NAME}'() requires --'""${PARAM_NAME}""' "; _INVALID_STATE="true"; }'
         shift 1
     done
@@ -218,22 +253,26 @@ function printCheckRequiredArgument() {
 
 
 function printVariableRequired() {
+    local PARAM_NAME
+    local VAR_NAME
     echo '    echo "  Required arguments"'
     for ARG in "$@"
     do
-        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
-        local VAR_NAME=$(echo "${PARAM_NAME}" | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
+        PARAM_NAME=$(parseValue "${1}" 1)
+        VAR_NAME=$(toVarName "${PARAM_NAME}")
         echo '    echo "    - '""${PARAM_NAME}""': ${'"${VAR_NAME}"'}"'
         shift 1
     done
 }
 
 function printVariableOptional() {
+    local PARAM_NAME
+    local VAR_NAME
     echo '    echo "  Optional arguments"'
     for ARG in "$@"
     do
-        local PARAM_NAME=$(awk -F',' '{print $1}' <<<${1})
-        local VAR_NAME=$(echo "${PARAM_NAME}" | perl -pe 's/(?:^|_)(.)/\U$1/g' | perl -ne 'print lc(join("_", split(/(?=[A-Z])/)))' |awk '{print toupper($1)}')
+        PARAM_NAME=$(parseValue "${1}" 1)
+        VAR_NAME=$(toVarName "${PARAM_NAME}")
         echo '    echo "    - '""${PARAM_NAME}""': ${'"${VAR_NAME}"'}"'
         shift 1
     done
