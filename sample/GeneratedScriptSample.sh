@@ -34,6 +34,7 @@ _EOT_
   exit 1
 }
 function printColored() { local B="\033[0;"; local C=""; case "${1}" in "red") C="31m";; "green") C="32m";; "yellow") C="33m";; "blue") C="34m";; esac; printf "%b%b\033[0m" "${B}${C}" "${2}"; }
+# [ keep-starter-parameters ] : curl -sf https://raw.githubusercontent.com/xshoji/bash-script-starter/master/ScriptStarter.sh |bash -s -  -n "GeneratedScriptSample" -a "xshoji" -d "This is generated script sample." -e "ENV_VAR1,xxxxx" -e "ENV_VAR2,xxxxx" -r "id,1001" -r "type,type-a,[ type-a | type-b ]" -o "name,xshoji" -o "city,tokyo,City." -f "dry-run" -f "read-only,Read only mode." -s -k
 
 
 
@@ -43,6 +44,7 @@ function printColored() { local B="\033[0;"; local C=""; case "${1}" in "red") C
 set -eu
 
 # Parse parameters
+readonly ARGS=("$@")
 for ARG in "$@"
 do
     SHIFT="true"
@@ -70,6 +72,15 @@ done
 [[ -z "${CITY+x}" ]] && { CITY=""; }
 [[ -z "${DRY_RUN+x}" ]] && { DRY_RUN="false"; }
 [[ -z "${READ_ONLY+x}" ]] && { READ_ONLY="false"; }
+# To readonly variables
+readonly ID
+readonly TYPE
+readonly NAME
+readonly CITY
+readonly DRY_RUN
+readonly READ_ONLY
+readonly ENV_VAR1
+readonly ENV_VAR2
 
 
 
@@ -94,19 +105,3 @@ dry-run: ${DRY_RUN}
 read-only: ${READ_ONLY}
 
 __EOT__
-
-# STARTER_URL=https://raw.githubusercontent.com/xshoji/bash-script-starter/master/ScriptStarter.sh
-# curl -sf ${STARTER_URL} |bash -s - \
-#   -n GeneratedScriptSample \
-#   -a xshoji \
-#   -d "This is generated script sample." \
-#   -e ENV_VAR1,xxxxx \
-#   -e ENV_VAR2,xxxxx \
-#   -r id,1001 \
-#   -r type,type-a,"[ type-a | type-b ]" \
-#   -o name,xshoji \
-#   -o city,tokyo,"City." \
-#   -f dry-run \
-#   -f read-only,"Read only mode." \
-#   -s > GeneratedScriptSample.sh
-
