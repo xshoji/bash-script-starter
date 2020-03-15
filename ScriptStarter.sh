@@ -483,6 +483,15 @@ function printDeclareVariableAsReadOnly() {
     done
 }
 
+function printDeclareEnvironmentVariableAsReadOnly() {
+    local PARAM_NAME
+    for ARG in "$@"
+    do
+        VAR_NAME=$(parseValue "${1}" 1)
+        echo "readonly ${VAR_NAME}"
+        shift 1
+    done
+}
 
 function printVariableEnvironment() {
     local VAR_NAME
@@ -645,7 +654,7 @@ if [[ ${PROTECT_ARGUMENTS} == "true" ]]; then
   printDeclareVariableAsReadOnly ${ARGS_REQUIRED[@]+"${ARGS_REQUIRED[@]}"}
   printDeclareVariableAsReadOnly ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"}
   printDeclareVariableAsReadOnly ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
-  printDeclareVariableAsReadOnly ${ARGS_ENVIRONMENT[@]+"${ARGS_ENVIRONMENT[@]}"}
+  printDeclareEnvironmentVariableAsReadOnly ${ARGS_ENVIRONMENT[@]+"${ARGS_ENVIRONMENT[@]}"}
 fi
 
 cat << __EOT__

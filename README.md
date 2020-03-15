@@ -62,13 +62,13 @@ bash-4.2# ./MyScript -h
  MyScript
 ------------- author: xshoji
 
-This is MyScript
+This is MyScript.
 
 Usage:
   ./MyScript
 
-Optional:
-  --debug : Enable debug mode
+Helper options:
+  --help, --debug
 
 bash-4.2# ./MyScript
 bash-4.2#
@@ -89,17 +89,17 @@ bash-4.2# ./MyScript
  MyScript
 ------------- author: xshoji
 
-This is MyScript
+This is MyScript.
 
 Usage:
   ./MyScript --id 1001 --name xshoji
 
 Required:
-  --id 1001     : "1001" means id
-  --name xshoji : "xshoji" means name
+  --id 1001     : "1001" means id.
+  --name xshoji : "xshoji" means name.
 
-Optional:
-  --debug : Enable debug mode
+Helper options:
+  --help, --debug
 
 bash-4.2#
 ```
@@ -111,21 +111,23 @@ Optional parameters are not validated.
 These optional parameters are initialized by default value.
 
 ```
-bash-4.2# curl -sf ${STARTER_URL} |bash -s - -n MyScript -a xshoji -o id,1001 -o name,xshoji,"A user name.","guest" > /tmp/MyScript > MyScript
+bash-4.2# curl -sf ${STARTER_URL} |bash -s - -n MyScript -a xshoji -o id,1001 -o name,xshoji,"A user name.","guest" > MyScript
 bash-4.2# ./MyScript -h
 
  MyScript
 ------------- author: xshoji
 
-This is MyScript
+This is MyScript.
 
 Usage:
   ./MyScript [ --id 1001 --name xshoji ]
 
 Optional:
-  --id 1001     : "1001" means id
+  --id 1001     : "1001" means id.
   --name xshoji : A user name. [ default: guest ]
-  --debug : Enable debug mode
+
+Helper options:
+  --help, --debug
 
 bash-4.2# ./MyScript
 
@@ -137,7 +139,7 @@ bash-4.2# ./MyScript --name myname
 
 [ Optional parameters ]
 id:
-name: guest
+name: myname
 
 bash-4.2#
 ```
@@ -155,15 +157,17 @@ bash-4.2# ./MyScript -h
  MyScript
 ------------- author: xshoji
 
-This is MyScript
+This is MyScript.
 
 Usage:
   ./MyScript [ --strict --dryRun ]
 
 Optional:
-  --strict : Enable strict flag
-  --dryRun : Enable dryRun flag
-  --debug : Enable debug mode
+  --strict : Enable strict flag.
+  --dryRun : Enable dryRun flag.
+
+Helper options:
+  --help, --debug
 
 bash-4.2# ./MyScript --strict
 
@@ -195,7 +199,7 @@ bash-4.2# ./MyScript
  MyScript
 ------------- author: xshoji
 
-This is MyScript
+This is MyScript.
 
 Usage:
   ./MyScript
@@ -204,24 +208,22 @@ Environment variables:
   export ENV_VAR_A=1001
   export ENV_VAR_B=xshoji
 
-Optional:
-  --debug : Enable debug mode
+Helper options:
+  --help, --debug
 
-bash-4.2# export export ENV_VAR_A=1001; export ENV_VAR_B=xshoji
+bash-4.2# export ENV_VAR_A=1001; export ENV_VAR_B=xshoji
 bash-4.2# ./MyScript
 
 [ Environment variables ]
 ENV_VAR_A: 1001
 ENV_VAR_B: xshoji
-
-bash-4.2#
 ```
 
 ### Support short name parameters
 
 You can specify each parameters as short name parameter.
 
-`-s` option enables short parameter.
+`-s, --short` option enables short parameter.
 
 ```
 bash-4.2# curl -sf ${STARTER_URL} |bash -s - -n MyScript -a xshoji -r id,1001 -o name,xshoji -f dryRun -s > MyScript
@@ -231,18 +233,20 @@ bash-4.2# ./MyScript
  MyScript
 ------------- author: xshoji
 
-This is MyScript
+This is MyScript.
 
 Usage:
   ./MyScript --id 1001 [ --name xshoji --dryRun ]
 
 Required:
-  -i, --id 1001 : "1001" means id
+  -i, --id 1001 : "1001" means id.
 
 Optional:
-  -n, --name xshoji : "xshoji" means name
-  -d, --dryRun : Enable dryRun flag
-  --debug : Enable debug mode
+  -n, --name xshoji : "xshoji" means name.
+  -d, --dryRun : Enable dryRun flag.
+
+Helper options:
+  --help, --debug
 
 bash-4.2# ./MyScript -i 1001 -n myname -d
 
@@ -252,8 +256,20 @@ id: 1001
 [ Optional parameters ]
 name: myname
 dryRun: true
+```
 
-bash-4.2#
+### Protect arguments
+
+`-p, --protect-arguments` option generates readonly declaring.
+
+```
+bash-4.2# curl -sf ${STARTER_URL} |bash -s - -n MyScript -r id,1001 -o name,xshoji -s -p > MyScript
+bash-4.2# cat MyScript
+...
+# To readonly variables
+readonly ID
+readonly NAME
+...
 ```
 
 ## How to use the generated script?
