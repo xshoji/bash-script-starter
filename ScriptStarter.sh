@@ -68,6 +68,7 @@ do
     { [[ "${ARG}" == "--short" ]]                   || [[ "${ARG}" == "-s" ]]; } && { shift 1; SHORT="true"; SHIFT="false"; }
     { [[ "${ARG}" == "--keep-starter-parameters" ]] || [[ "${ARG}" == "-k" ]]; } && { shift 1; KEEP_STARTER_PARAMETERS="true"; SHIFT="false"; }
     { [[ "${ARG}" == "--protect-arguments" ]]       || [[ "${ARG}" == "-p" ]]; } && { shift 1; PROTECT_ARGUMENTS="true"; SHIFT="false"; }
+    { [[ "${ARG}" == "--help" ]] || [[ "${ARG}" == "-h" ]]; } && { shift 1; HELP="true"; SHIFT="false"; }
     { [[ "${SHIFT}" == "true" ]] && [[ "$#" -gt 0 ]]; } && { shift 1; }
 done
 [[ -n "${HELP+x}" ]] && { usage 0; }

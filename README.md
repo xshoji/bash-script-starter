@@ -15,8 +15,7 @@ bash-4.2# STARTER_URL=https://raw.githubusercontent.com/xshoji/bash-script-start
 Display usage.
 
 ```
-bash-4.2# curl -sf ${STARTER_URL} |bash -s
-[!] --naming is required.
+bash-4.2# ./ScriptStarter.sh -h
 
  ScriptStarter
 ------------------ author: xshoji
@@ -24,7 +23,7 @@ bash-4.2# curl -sf ${STARTER_URL} |bash -s
 This script generates a template of bash script tool.
 
 Usage:
-  ./ScriptStarter.sh --naming scriptName [ --author author --description Description --required paramName,sample,description --required ... --optional paramName,sample,description,defaultValue(omittable) --optional ... --flag flagName,description --flag ... --env variableName,sample --env ... --short ]
+  ./ScriptStarter.sh --naming scriptName [ --author author --description Description --description ... --required paramName,sample,description --required ... --optional paramName,sample,description,defaultValue(omittable) --optional ... --flag flagName,description --flag ... --env variableName,sample --env ... --short  --keep-starter-parameters --protect-arguments ]
 
 Required:
   -n, --naming scriptName : Script name.
@@ -34,10 +33,14 @@ Optional:
   -d, --description Description                                       : Description of this script. [ example: --description "ScriptStarter's description here." ]
   -r, --required paramName,sample,description                         : Required parameter setting. [ example: --required id,1001,"Primary id here." ]
   -o, --optional paramName,sample,description,defaultValue(omittable) : Optional parameter setting. [ example: --option name,xshoji,"User name here.",defaultUser ]
-  -f, --flag flagName,description                                     : Optional flag parameter setting. [ example: --flag dryRun,"Dry run mode." ]
-  -e, --env variableName,sample                                       : Required environment variable. [ example: --env API_HOST,example.com ]
-  -s, --short : Enable short parameter. [ example: --short ]
-  --debug : Enable debug mode
+  -f, --flag flagName,description                                     : Optional flag setting. [ example: --flag dryRun,"Dry run mode." ]
+  -e, --env variableName,sample                                       : Required environment variable setting. [ example: --env API_HOST,example.com ]
+  -s, --short                   : Enable short parameter. [ example: --short ]
+  -k, --keep-starter-parameters : Keep parameter details of bash-script-starter in the generated scprit. [ example: --keep-starter-parameters ]
+  -p, --protect-arguments       : Declare argument variables as readonly. [ example: --protect-arguments ]
+
+Helper options:
+  --help, --debug
 
 bash-4.2#
 ```
