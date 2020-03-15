@@ -79,8 +79,8 @@ readonly NAME
 readonly CITY
 readonly DRY_RUN
 readonly READ_ONLY
-readonly E_N_V_V_A_R1
-readonly E_N_V_V_A_R2
+readonly ENV_VAR1
+readonly ENV_VAR2
 
 
 
