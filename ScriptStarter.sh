@@ -346,7 +346,6 @@ function printBashScriptStarterCurl() {
     for ARG in "${LOCAL_ARGS[@]}"
     do
         SHIFT="true"
-        { [[ "${ARG}" == "--debug" ]]; } && { shift 1; set -eux; SHIFT="false"; }
         { [[ "${ARG}" == "--naming" ]]                  || [[ "${ARG}" == "-n" ]]; } && { echo -n " ${ARG}"; shift 1; echo -n " \""; escapeDoubleQuote "${1}"; echo -n "\""; SHIFT="false"; }
         { [[ "${ARG}" == "--description" ]]             || [[ "${ARG}" == "-d" ]]; } && { echo -n " ${ARG}"; shift 1; echo -n " \""; escapeDoubleQuote "${1}"; echo -n "\""; SHIFT="false"; }
         { [[ "${ARG}" == "--author" ]]                  || [[ "${ARG}" == "-a" ]]; } && { echo -n " ${ARG}"; shift 1; echo -n " \""; escapeDoubleQuote "${1}"; echo -n "\""; SHIFT="false"; }
