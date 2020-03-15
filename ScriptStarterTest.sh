@@ -64,6 +64,8 @@ __EOT__
 set +e
 COUNT=1
 GENERATED_SCRIPT_FILE_PATH=/tmp/test.sh
+touch ${GENERATED_SCRIPT_FILE_PATH}
+chmod +x ${GENERATED_SCRIPT_FILE_PATH}
 trap "rm -rf ${GENERATED_SCRIPT_FILE_PATH}" EXIT SIGINT
 
 echo;echo;echo;
@@ -105,7 +107,7 @@ echo;echo;echo;
 echo "================="
 echo ${COUNT}". Required parameter and Optional parameter are specified."
 COUNT=$(( COUNT + 1 ))
-./${SCRIPT_PATH} --naming test --author user --required aaa,aaa --option bbb,bbb > ${GENERATED_SCRIPT_FILE_PATH}
+./${SCRIPT_PATH} --naming test --author user --required aaa,aaa --optional bbb,bbb > ${GENERATED_SCRIPT_FILE_PATH}
 chmod 777 ${GENERATED_SCRIPT_FILE_PATH}
 ${GENERATED_SCRIPT_FILE_PATH}
 ${GENERATED_SCRIPT_FILE_PATH} --aaa aaa
@@ -115,7 +117,7 @@ echo;echo;echo;
 echo "================="
 echo ${COUNT}". Required, Optional, Flag parameter are specified. Optional parameter has description."
 COUNT=$(( COUNT + 1 ))
-./${SCRIPT_PATH} --naming test --author user --required aaa,aaa,"aaa param is here." --option bbb,bbb,"bbb param is here." --flag ccc,"ccc flag is here." > ${GENERATED_SCRIPT_FILE_PATH}
+./${SCRIPT_PATH} --naming test --author user --required aaa,aaa,"aaa param is here." --optional bbb,bbb,"bbb param is here." --flag ccc,"ccc flag is here." > ${GENERATED_SCRIPT_FILE_PATH}
 chmod 777 ${GENERATED_SCRIPT_FILE_PATH}
 ${GENERATED_SCRIPT_FILE_PATH}
 ${GENERATED_SCRIPT_FILE_PATH} --aaa aaa
@@ -126,7 +128,7 @@ echo;echo;echo;
 echo "================="
 echo ${COUNT}". Required, Optional, Flag parameter are specified. Optional parameter has description and default value."
 COUNT=$(( COUNT + 1 ))
-./${SCRIPT_PATH} --naming test --author user --required aaa,aaa,"aaa param is here." --option bbb,bbb,"bbb param is here.","DefaultB" --flag ccc,"ccc flag is here." > ${GENERATED_SCRIPT_FILE_PATH}
+./${SCRIPT_PATH} --naming test --author user --required aaa,aaa,"aaa param is here." --optional bbb,bbb,"bbb param is here.","DefaultB" --flag ccc,"ccc flag is here." > ${GENERATED_SCRIPT_FILE_PATH}
 chmod 777 ${GENERATED_SCRIPT_FILE_PATH}
 ${GENERATED_SCRIPT_FILE_PATH}
 ${GENERATED_SCRIPT_FILE_PATH} --aaa aaa
@@ -148,7 +150,7 @@ echo;echo;echo;
 echo "================="
 echo ${COUNT}". Optional and Flag parameter are specified. "
 COUNT=$(( COUNT + 1 ))
-./${SCRIPT_PATH} --naming test --author user --option bbb,bbb --flag ccc > ${GENERATED_SCRIPT_FILE_PATH}
+./${SCRIPT_PATH} --naming test --author user --optional bbb,bbb --flag ccc > ${GENERATED_SCRIPT_FILE_PATH}
 chmod 777 ${GENERATED_SCRIPT_FILE_PATH}
 ${GENERATED_SCRIPT_FILE_PATH}
 ${GENERATED_SCRIPT_FILE_PATH} --bbb bbb
@@ -158,7 +160,7 @@ echo;echo;echo;
 echo "================="
 echo ${COUNT}". Strange parameters are specified by free order."
 COUNT=$(( COUNT + 1 ))
-./${SCRIPT_PATH} --xxx --flag ccc --yyy --option bbb,bbb --required xxx,xxx --naming test --author user > ${GENERATED_SCRIPT_FILE_PATH}
+./${SCRIPT_PATH} --xxx --flag ccc --yyy --optional bbb,bbb --required xxx,xxx --naming test --author user > ${GENERATED_SCRIPT_FILE_PATH}
 chmod 777 ${GENERATED_SCRIPT_FILE_PATH}
 ${GENERATED_SCRIPT_FILE_PATH}
 ${GENERATED_SCRIPT_FILE_PATH} --xxx xxx
@@ -273,6 +275,19 @@ ${GENERATED_SCRIPT_FILE_PATH} --help
 ${GENERATED_SCRIPT_FILE_PATH}
 export T1=aaa
 ${GENERATED_SCRIPT_FILE_PATH} -a a -o b -d ddd
+
+
+echo;echo;echo;
+echo "================="
+echo ${COUNT}". Check '--keep-starter-parameters' option."
+COUNT=$(( COUNT + 1 ))
+./${SCRIPT_PATH} -n test -a user -d aaa\,bbb\,ccc\,ddd -d eee\,fff\,ggg -s -r aaa,"aaa\,aaa","aaa\,aaaa" -o bbb,bbb\\,bbb,bbb\\,bbb,bbb\\,bbb -f c3,"c3 flag\, is here." -o ddd,"\"ddd\,ddd\\,ddd\""  -e T1,t111\\,t111," Test\,Test" -k > ${GENERATED_SCRIPT_FILE_PATH}
+${GENERATED_SCRIPT_FILE_PATH} --help
+${GENERATED_SCRIPT_FILE_PATH}
+export T1=aaa
+${GENERATED_SCRIPT_FILE_PATH} -a a -o b -d ddd
+cat ${GENERATED_SCRIPT_FILE_PATH} |grep "keep-starter-parameters"
+
 
 # STARTER_URL=https://raw.githubusercontent.com/xshoji/bash-script-starter/master/ScriptStarter.sh
 # curl -sf ${STARTER_URL} |bash -s - \

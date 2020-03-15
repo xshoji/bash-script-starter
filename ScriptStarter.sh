@@ -10,7 +10,7 @@ cat << _EOT_
 This script generates a template of bash script tool.
 
 Usage:
-  ./$(basename "$0") --naming scriptName [ --author author --description Description --description ... --required paramName,sample,description --required ... --optional paramName,sample,description,defaultValue(omittable) --optional ... --flag flagName,description --flag ... --env variableName,sample --env ... --short ]
+  ./$(basename "$0") --naming scriptName [ --author author --description Description --description ... --required paramName,sample,description --required ... --optional paramName,sample,description,defaultValue(omittable) --optional ... --flag flagName,description --flag ... --env variableName,sample --env ... --short  --keep-starter-parameters ]
 
 Required:
   -n, --naming scriptName : Script name.
@@ -22,7 +22,8 @@ Optional:
   -o, --optional paramName,sample,description,defaultValue(omittable) : Optional parameter setting. [ example: --option name,xshoji,"User name here.",defaultUser ]
   -f, --flag flagName,description                                     : Optional flag setting. [ example: --flag dryRun,"Dry run mode." ]
   -e, --env variableName,sample                                       : Required environment variable setting. [ example: --env API_HOST,example.com ]
-  -s, --short : Enable short parameter. [ example: --short ]
+  -s, --short                   : Enable short parameter. [ example: --short ]
+  -k, --keep-starter-parameters : Keep parameter details of bash-script-starter in the generated scprit. [ example: --keep-starter-parameters ]
 
 Helper options:
   --help, --debug
@@ -51,17 +52,19 @@ ARGS_ENVIRONMENT=()
 ARGS_SHORT=()
 ARGS_DESCRIPTION=()
 
+readonly BASH_SCRIPT_STARTER_ARGS=("$@")
 for ARG in "$@"
 do
     SHIFT="true"
     { [[ "${ARG}" == "--debug" ]]; } && { shift 1; set -eux; SHIFT="false"; }
-    { [[ "${ARG}" == "--naming" ]]      || [[ "${ARG}" == "-n" ]]; } && { shift 1; NAMING="${1}"; SHIFT="false"; }
-    { [[ "${ARG}" == "--author" ]]      || [[ "${ARG}" == "-a" ]]; } && { shift 1; AUTHOR="${1}"; SHIFT="false"; }
-    { [[ "${ARG}" == "--required" ]]    || [[ "${ARG}" == "-r" ]]; } && { shift 1; ARGS_REQUIRED+=("${1}"); SHIFT="false"; }
-    { [[ "${ARG}" == "--optional" ]]    || [[ "${ARG}" == "-o" ]]; } && { shift 1; ARGS_OPTIONAL+=("${1}"); SHIFT="false"; }
-    { [[ "${ARG}" == "--flag" ]]        || [[ "${ARG}" == "-f" ]]; } && { shift 1; ARGS_FLAG+=("${1}"); SHIFT="false"; }
-    { [[ "${ARG}" == "--env" ]]         || [[ "${ARG}" == "-e" ]]; } && { shift 1; ARGS_ENVIRONMENT+=("${1}"); SHIFT="false"; }
-    { [[ "${ARG}" == "--short" ]]       || [[ "${ARG}" == "-s" ]]; } && { shift 1; SHORT="true"; SHIFT="false"; }
+    { [[ "${ARG}" == "--naming" ]]                  || [[ "${ARG}" == "-n" ]]; } && { shift 1; NAMING="${1}"; SHIFT="false"; }
+    { [[ "${ARG}" == "--author" ]]                  || [[ "${ARG}" == "-a" ]]; } && { shift 1; AUTHOR="${1}"; SHIFT="false"; }
+    { [[ "${ARG}" == "--required" ]]                || [[ "${ARG}" == "-r" ]]; } && { shift 1; ARGS_REQUIRED+=("${1}"); SHIFT="false"; }
+    { [[ "${ARG}" == "--optional" ]]                || [[ "${ARG}" == "-o" ]]; } && { shift 1; ARGS_OPTIONAL+=("${1}"); SHIFT="false"; }
+    { [[ "${ARG}" == "--flag" ]]                    || [[ "${ARG}" == "-f" ]]; } && { shift 1; ARGS_FLAG+=("${1}"); SHIFT="false"; }
+    { [[ "${ARG}" == "--env" ]]                     || [[ "${ARG}" == "-e" ]]; } && { shift 1; ARGS_ENVIRONMENT+=("${1}"); SHIFT="false"; }
+    { [[ "${ARG}" == "--short" ]]                   || [[ "${ARG}" == "-s" ]]; } && { shift 1; SHORT="true"; SHIFT="false"; }
+    { [[ "${ARG}" == "--keep-starter-parameters" ]] || [[ "${ARG}" == "-k" ]]; } && { shift 1; KEEP_STARTER_PARAMETERS="true"; SHIFT="false"; }
     { [[ "${ARG}" == "--description" ]] || [[ "${ARG}" == "-d" ]]; } && { shift 1; ARGS_DESCRIPTION+=("${1}"); SHIFT="false"; }
     { [[ "${SHIFT}" == "true" ]] && [[ "$#" -gt 0 ]]; } && { shift 1; }
 done
@@ -74,19 +77,20 @@ done
 [[ -z "${AUTHOR+x}" ]] && { AUTHOR=""; }
 [[ -z "${DESCRIPTION+x}" ]] && { DESCRIPTION=""; }
 [[ -z "${SHORT+x}" ]] && { SHORT="false"; }
+[[ -z "${KEEP_STARTER_PARAMETERS+x}" ]] && { KEEP_STARTER_PARAMETERS="false"; }
 
 
 # Define constant variable
-PROVISIONAL_STRING=$(openssl rand -hex 12 | fold -w 12 | head -1)
-BASE_INDENT=""
+readonly PROVISIONAL_STRING=$(openssl rand -hex 12 | fold -w 12 | head -1)
+readonly BASE_INDENT=""
+readonly BASH_SCRIPT_STARTER_URL="https://raw.githubusercontent.com/xshoji/bash-script-starter/master/ScriptStarter.sh"
 
 #==========================================
 # Functions
 #==========================================
 
 function printUsageFunctionTopPart() {
-
-cat << __EOT__
+  cat << __EOT__
 #!/bin/bash
 
 function usage()
@@ -95,21 +99,23 @@ cat << _EOT_
 
 ${BASE_INDENT} ${1}
 __EOT__
-
-echo -n "${BASE_INDENT}"
-local NAME_LENGTH=${#1}
-NAME_LENGTH=$((NAME_LENGTH + 5))
-COMMAND="printf -- '-%.0s' {1..${NAME_LENGTH}}"
-eval "${COMMAND}"
-AUTHOR=""
-[[ "${2}" != "" ]] && { AUTHOR=" author: ${2}"; }
-echo "${AUTHOR}"
-echo
-
+  echo -n "${BASE_INDENT}"
+  local NAME_LENGTH=${#1}
+  NAME_LENGTH=$((NAME_LENGTH + 5))
+  COMMAND="printf -- '-%.0s' {1..${NAME_LENGTH}}"
+  eval "${COMMAND}"
+  AUTHOR=""
+  [[ "${2}" != "" ]] && { AUTHOR=" author: ${2}"; }
+  echo "${AUTHOR}"
+  echo
 }
 
 function parseValue() {
   echo "${1}" |sed "s/\\\,/${PROVISIONAL_STRING}/g" |awk -F',' '{print $'"${2}"'}' |sed "s/${PROVISIONAL_STRING}/,/g"
+}
+
+function escapeDoubleQuote() {
+  echo -n $(echo "${1}" |sed 's/\"/\\"/g')
 }
 
 function toVarName() {
@@ -315,7 +321,7 @@ function printParameterDescriptionFlag() {
 
 
 function printUsageFunctionBottomPart() {
-cat << __EOT__
+    cat << __EOT__
 _EOT_
   [[ "\${1+x}" != "" ]] && { exit "\${1}"; }
   exit 1
@@ -324,10 +330,33 @@ __EOT__
 }
 
 function printColoredMessageFunction() {
-cat << __EOT__
+    cat << __EOT__
 function printColored() { local B="\033[0;"; local C=""; case "\${1}" in "red") C="31m";; "green") C="32m";; "yellow") C="33m";; "blue") C="34m";; esac; printf "%b%b\033[0m" "\${B}\${C}" "\${2}"; }
 __EOT__
 }
+
+function printBashScriptStarterCurl() {
+    local LOCAL_ARGS=("$@")
+    echo -n "# [ keep-starter-parameters ] : curl -sf ${BASH_SCRIPT_STARTER_URL} |bash -s - "
+    for ARG in "${LOCAL_ARGS[@]}"
+    do
+        SHIFT="true"
+        { [[ "${ARG}" == "--debug" ]]; } && { shift 1; set -eux; SHIFT="false"; }
+        { [[ "${ARG}" == "--naming" ]]                  || [[ "${ARG}" == "-n" ]]; } && { echo -n " ${ARG}"; shift 1; echo -n " \""; escapeDoubleQuote "${1}"; echo -n "\""; SHIFT="false"; }
+        { [[ "${ARG}" == "--description" ]]             || [[ "${ARG}" == "-d" ]]; } && { echo -n " ${ARG}"; shift 1; echo -n " \""; escapeDoubleQuote "${1}"; echo -n "\""; SHIFT="false"; }
+        { [[ "${ARG}" == "--author" ]]                  || [[ "${ARG}" == "-a" ]]; } && { echo -n " ${ARG}"; shift 1; echo -n " \""; escapeDoubleQuote "${1}"; echo -n "\""; SHIFT="false"; }
+        { [[ "${ARG}" == "--required" ]]                || [[ "${ARG}" == "-r" ]]; } && { echo -n " ${ARG}"; shift 1; echo -n " \""; escapeDoubleQuote "${1}"; echo -n "\""; SHIFT="false"; }
+        { [[ "${ARG}" == "--optional" ]]                || [[ "${ARG}" == "-o" ]]; } && { echo -n " ${ARG}"; shift 1; echo -n " \""; escapeDoubleQuote "${1}"; echo -n "\""; SHIFT="false"; }
+        { [[ "${ARG}" == "--env" ]]                     || [[ "${ARG}" == "-e" ]]; } && { echo -n " ${ARG}"; shift 1; echo -n " \""; escapeDoubleQuote "${1}"; echo -n "\""; SHIFT="false"; }
+        { [[ "${ARG}" == "--flag" ]]                    || [[ "${ARG}" == "-f" ]]; } && { echo -n " ${ARG}"; shift 1; echo -n " \""; escapeDoubleQuote "${1}"; echo -n "\""; SHIFT="false"; }
+        { [[ "${ARG}" == "--short" ]]                   || [[ "${ARG}" == "-s" ]]; } && { echo -n " ${ARG}"; shift 1; SHIFT="false"; }
+        { [[ "${ARG}" == "--keep-starter-parameters" ]] || [[ "${ARG}" == "-k" ]]; } && { echo -n " ${ARG}"; shift 1; SHIFT="false"; }
+        { [[ "${SHIFT}" == "true" ]] && [[ "$#" -gt 0 ]]; } && { shift 1; }
+    done
+    echo
+}
+
+
 
 function printParseArgument() {
     local PARAM_NAME
@@ -540,6 +569,7 @@ echo
 
 printUsageFunctionBottomPart
 printColoredMessageFunction
+[[ "${KEEP_STARTER_PARAMETERS}" == "true" ]] && { printBashScriptStarterCurl "${BASH_SCRIPT_STARTER_ARGS[@]}"; }
 
 cat << "__EOT__"
 
