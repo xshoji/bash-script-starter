@@ -356,6 +356,7 @@ function printBashScriptStarterCurl() {
         { [[ "${ARG}" == "--flag" ]]                    || [[ "${ARG}" == "-f" ]]; } && { echo -n " ${ARG}"; shift 1; echo -n " \""; escapeDoubleQuote "${1}"; echo -n "\""; SHIFT="false"; }
         { [[ "${ARG}" == "--short" ]]                   || [[ "${ARG}" == "-s" ]]; } && { echo -n " ${ARG}"; shift 1; SHIFT="false"; }
         { [[ "${ARG}" == "--keep-starter-parameters" ]] || [[ "${ARG}" == "-k" ]]; } && { echo -n " ${ARG}"; shift 1; SHIFT="false"; }
+        { [[ "${ARG}" == "--protect-arguments" ]]       || [[ "${ARG}" == "-p" ]]; } && { echo -n " ${ARG}"; shift 1; SHIFT="false"; }
         { [[ "${SHIFT}" == "true" ]] && [[ "$#" -gt 0 ]]; } && { shift 1; }
     done
     echo
