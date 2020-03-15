@@ -10,7 +10,7 @@ cat << _EOT_
 This script generates a template of bash script tool.
 
 Usage:
-  ./$(basename "$0") --naming scriptName [ --author author --description Description --description ... --required paramName,sample,description --required ... --optional paramName,sample,description,defaultValue(omittable) --optional ... --flag flagName,description --flag ... --env variableName,sample --env ... --short  --keep-starter-parameters ]
+  ./$(basename "$0") --naming scriptName [ --author author --description Description --description ... --required paramName,sample,description --required ... --optional paramName,sample,description,defaultValue(omittable) --optional ... --flag flagName,description --flag ... --env variableName,sample --env ... --short  --keep-starter-parameters --protect-arguments ]
 
 Required:
   -n, --naming scriptName : Script name.
@@ -24,6 +24,7 @@ Optional:
   -e, --env variableName,sample                                       : Required environment variable setting. [ example: --env API_HOST,example.com ]
   -s, --short                   : Enable short parameter. [ example: --short ]
   -k, --keep-starter-parameters : Keep parameter details of bash-script-starter in the generated scprit. [ example: --keep-starter-parameters ]
+  -p, --protect-arguments       : Declare argument variables as readonly. [ example: --protect-arguments ]
 
 Helper options:
   --help, --debug
@@ -59,13 +60,14 @@ do
     { [[ "${ARG}" == "--debug" ]]; } && { shift 1; set -eux; SHIFT="false"; }
     { [[ "${ARG}" == "--naming" ]]                  || [[ "${ARG}" == "-n" ]]; } && { shift 1; NAMING="${1}"; SHIFT="false"; }
     { [[ "${ARG}" == "--author" ]]                  || [[ "${ARG}" == "-a" ]]; } && { shift 1; AUTHOR="${1}"; SHIFT="false"; }
+    { [[ "${ARG}" == "--description" ]]             || [[ "${ARG}" == "-d" ]]; } && { shift 1; ARGS_DESCRIPTION+=("${1}"); SHIFT="false"; }
     { [[ "${ARG}" == "--required" ]]                || [[ "${ARG}" == "-r" ]]; } && { shift 1; ARGS_REQUIRED+=("${1}"); SHIFT="false"; }
     { [[ "${ARG}" == "--optional" ]]                || [[ "${ARG}" == "-o" ]]; } && { shift 1; ARGS_OPTIONAL+=("${1}"); SHIFT="false"; }
     { [[ "${ARG}" == "--flag" ]]                    || [[ "${ARG}" == "-f" ]]; } && { shift 1; ARGS_FLAG+=("${1}"); SHIFT="false"; }
     { [[ "${ARG}" == "--env" ]]                     || [[ "${ARG}" == "-e" ]]; } && { shift 1; ARGS_ENVIRONMENT+=("${1}"); SHIFT="false"; }
     { [[ "${ARG}" == "--short" ]]                   || [[ "${ARG}" == "-s" ]]; } && { shift 1; SHORT="true"; SHIFT="false"; }
     { [[ "${ARG}" == "--keep-starter-parameters" ]] || [[ "${ARG}" == "-k" ]]; } && { shift 1; KEEP_STARTER_PARAMETERS="true"; SHIFT="false"; }
-    { [[ "${ARG}" == "--description" ]] || [[ "${ARG}" == "-d" ]]; } && { shift 1; ARGS_DESCRIPTION+=("${1}"); SHIFT="false"; }
+    { [[ "${ARG}" == "--protect-arguments" ]]       || [[ "${ARG}" == "-p" ]]; } && { shift 1; PROTECT_ARGUMENTS="true"; SHIFT="false"; }
     { [[ "${SHIFT}" == "true" ]] && [[ "$#" -gt 0 ]]; } && { shift 1; }
 done
 [[ -n "${HELP+x}" ]] && { usage 0; }
@@ -78,6 +80,8 @@ done
 [[ -z "${DESCRIPTION+x}" ]] && { DESCRIPTION=""; }
 [[ -z "${SHORT+x}" ]] && { SHORT="false"; }
 [[ -z "${KEEP_STARTER_PARAMETERS+x}" ]] && { KEEP_STARTER_PARAMETERS="false"; }
+[[ -z "${PROTECT_ARGUMENTS+x}" ]] && { PROTECT_ARGUMENTS="false"; }
+[[ -z "${PROTECT_ARGUMENTS+x}" ]] && { PROTECT_ARGUMENTS="false"; }
 
 
 # Define constant variable
@@ -466,6 +470,19 @@ function printSetInitialValueFlag() {
     done
 }
 
+
+function printDeclareVariableAsReadOnly() {
+    local PARAM_NAME
+    for ARG in "$@"
+    do
+        PARAM_NAME=$(parseValue "${1}" 1)
+        VAR_NAME=$(toVarName "${PARAM_NAME}")
+        echo "readonly ${VAR_NAME}"
+        shift 1
+    done
+}
+
+
 function printVariableEnvironment() {
     local VAR_NAME
     echo "[ Environment variables ]"
@@ -581,6 +598,7 @@ cat << "__EOT__"
 set -eu
 
 # Parse parameters
+readonly ARGS=("$@")
 for ARG in "$@"
 do
     SHIFT="true"
@@ -621,6 +639,14 @@ fi
 printSetInitialValueOptional ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"}
 printSetInitialValueFlag ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
 
+if [[ ${PROTECT_ARGUMENTS} == "true" ]]; then
+  echo "# To readonly variables"
+  printDeclareVariableAsReadOnly ${ARGS_REQUIRED[@]+"${ARGS_REQUIRED[@]}"}
+  printDeclareVariableAsReadOnly ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"}
+  printDeclareVariableAsReadOnly ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
+  printDeclareVariableAsReadOnly ${ARGS_ENVIRONMENT[@]+"${ARGS_ENVIRONMENT[@]}"}
+fi
+
 cat << __EOT__
 
 
@@ -650,6 +676,7 @@ fi
 
 [[ -n "${REQUIRED_EOT+x}" ]] && { echo '__EOT__'; }
 
+
 # STARTER_URL=https://raw.githubusercontent.com/xshoji/bash-script-starter/master/ScriptStarter.sh
 # curl -sf ${STARTER_URL} |bash -s - \
 #   -n ScriptStarter \
@@ -663,4 +690,6 @@ fi
 #   -o flag,"flagName\,description","Optional flag setting. [ example: --flag dryRun\,\"Dry run mode.\" ]" \
 #   -o env,"variableName\,sample","Required environment variable setting. [ example: --env API_HOST\,example.com ]" \
 #   -f short,"Enable short parameter. [ example: --short ]" \
-#   -s > /tmp/test.sh; open /tmp/test.sh
+#   -f keep-starter-parameters,"Keep parameter details of bash-script-starter in the generated scprit. [ example: --keep-starter-parameters ]" \
+#   -f protect-arguments,"Declare argument variables as readonly. [ example: --protect-arguments ]" \
+#   -s -k > /tmp/test.sh; open /tmp/test.sh

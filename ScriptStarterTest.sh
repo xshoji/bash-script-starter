@@ -288,6 +288,16 @@ export T1=aaa
 ${GENERATED_SCRIPT_FILE_PATH} -a a -o b -d ddd
 cat ${GENERATED_SCRIPT_FILE_PATH} |grep "keep-starter-parameters"
 
+echo;echo;echo;
+echo "================="
+echo ${COUNT}". Check '--protect-arguments' option."
+COUNT=$(( COUNT + 1 ))
+./${SCRIPT_PATH} -n test -a user -d aaa\,bbb\,ccc\,ddd -d eee\,fff\,ggg -s -r aaa,"aaa\,aaa","aaa\,aaaa" -o bbb,bbb\\,bbb,bbb\\,bbb,bbb\\,bbb -f c3,"c3 flag\, is here." -o ddd,"\"ddd\,ddd\\,ddd\""  -e T1,t111\\,t111," Test\,Test" -k -p > ${GENERATED_SCRIPT_FILE_PATH}
+${GENERATED_SCRIPT_FILE_PATH} --help
+${GENERATED_SCRIPT_FILE_PATH}
+export T1=aaa
+${GENERATED_SCRIPT_FILE_PATH} -a a -o b -d ddd
+cat ${GENERATED_SCRIPT_FILE_PATH} |grep "readonly"
 
 # STARTER_URL=https://raw.githubusercontent.com/xshoji/bash-script-starter/master/ScriptStarter.sh
 # curl -sf ${STARTER_URL} |bash -s - \
