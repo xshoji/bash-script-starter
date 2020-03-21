@@ -86,7 +86,7 @@ done
 
 
 # Define constant variable
-readonly PROVISIONAL_STRING=$(openssl rand -hex 12 | fold -w 12 | head -1)
+readonly PROVISIONAL_STRING="5bb49c48176e" # random string
 readonly BASE_INDENT=""
 readonly BASH_SCRIPT_STARTER_URL="https://raw.githubusercontent.com/xshoji/bash-script-starter/master/ScriptStarter.sh"
 
@@ -98,8 +98,7 @@ function printUsageFunctionTopPart() {
   cat << __EOT__
 #!/bin/bash
 
-function usage()
-{
+function usage() {
 cat << _EOT_
 
 ${BASE_INDENT} ${1}
@@ -120,7 +119,7 @@ function parseValue() {
 }
 
 function escapeDoubleQuote() {
-  echo -n $(echo "${1}" |sed 's/\"/\\"/g')
+  echo -n "${1//\"/\\\"}"
 }
 
 function toVarName() {
@@ -201,6 +200,7 @@ function printParameterDescription() {
     PARAMETER_DESCRIPTION_LINES=()
     for DESCRIPTION_LINE in "$@"
     do
+        # shellcheck disable=SC2001
         CURRENT_PARAM_SAMPLE_STRING=$(echo "${DESCRIPTION_LINE}" |sed "s/${PROVISIONAL_STRING}.*//g")
         SAMPLE_STRING_LENGTH="${#CURRENT_PARAM_SAMPLE_STRING}"
         if [[ "${PARAMETER_SAMPLE_LENGTH_MAX}" -lt "${SAMPLE_STRING_LENGTH}" ]]; then
@@ -213,12 +213,13 @@ function printParameterDescription() {
     local DIFF_SPACE_LENGTH
     for DESCRIPTION_LINE in "$@"
     do
+        # shellcheck disable=SC2001
         CURRENT_PARAM_SAMPLE_STRING=$(echo "${DESCRIPTION_LINE}" |sed "s/${PROVISIONAL_STRING}.*//g")
         CURRENT_LINE_LENGTH="${#CURRENT_PARAM_SAMPLE_STRING}"
         DIFF_SPACE_LENGTH=$(( PARAMETER_SAMPLE_LENGTH_MAX -  CURRENT_LINE_LENGTH ))
         CREATE_SPACE_COMMAND="printf ' %.0s' {0..${DIFF_SPACE_LENGTH}}"
         DIFF_SPACE_STRING=$(eval "${CREATE_SPACE_COMMAND}")
-        PRINTED_LINE=$(echo "${DESCRIPTION_LINE}" |sed "s/${PROVISIONAL_STRING}/${DIFF_SPACE_STRING}/g")
+        PRINTED_LINE="${DESCRIPTION_LINE//${PROVISIONAL_STRING}/${DIFF_SPACE_STRING}}"
         echo "${BASE_INDENT}  ${PRINTED_LINE}"
     done
 }
@@ -230,7 +231,7 @@ function printParameterDescriptionRequired() {
     local SAMPLE
     local DESCRIPTION
     local PARAM_NAME_SHORT
-    local IS_USED_SHORT_PARAM
+    local IS_NOT_USED_SHORT_PARAM
     local LINE
     for ARG in "$@"
     do
@@ -241,9 +242,12 @@ function printParameterDescriptionRequired() {
         PARAM_NAME_SHORT=$(cut -c 1 <<<"${PARAM_NAME}")
         [[ "${SAMPLE}" == "" ]] && { SAMPLE=${PARAM_NAME}; }
         [[ "${DESCRIPTION}" == "" ]] && { DESCRIPTION="\"${SAMPLE}\" means ${PARAM_NAME}."; }
-        IS_USED_SHORT_PARAM=$(grep "${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
+        set +e
+        echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"} |grep "${PARAM_NAME_SHORT}"
+        IS_NOT_USED_SHORT_PARAM="$?"
+        set -e
         LINE=$(echo -n "--${PARAM_NAME}")
-        if [[ "${SHORT}" == "true" ]] && [[ "${IS_USED_SHORT_PARAM}" == "" ]]; then
+        if [[ "${SHORT}" == "true" ]] && [[ "${IS_NOT_USED_SHORT_PARAM}" == "1" ]]; then
             ARGS_SHORT+=("${PARAM_NAME_SHORT}")
             LINE=$(echo -n "-${PARAM_NAME_SHORT}, ${LINE}")
         fi
@@ -265,7 +269,7 @@ function printParameterDescriptionOptional() {
     local DESCRIPTION
     local DEFAULT
     local PARAM_NAME_SHORT
-    local IS_USED_SHORT_PARAM
+    local IS_NOT_USED_SHORT_PARAM
     local LINE
     local PARAMETER_DESCRIPTION_LINES=()
     for ARG in "$@"
@@ -277,9 +281,12 @@ function printParameterDescriptionOptional() {
         PARAM_NAME_SHORT=$(cut -c 1 <<<"${PARAM_NAME}")
         [[ "${SAMPLE}" == "" ]] && { SAMPLE="${PARAM_NAME}"; }
         [[ "${DESCRIPTION}" == "" ]] && { DESCRIPTION="\"${SAMPLE}\" means ${PARAM_NAME}."; }
-        IS_USED_SHORT_PARAM=$(grep "${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
+        set +e
+        echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"} |grep "${PARAM_NAME_SHORT}"
+        IS_NOT_USED_SHORT_PARAM="$?"
+        set -e
         LINE=$(echo -n "--${PARAM_NAME}")
-        if [[ "${SHORT}" == "true" ]] && [[ "${IS_USED_SHORT_PARAM}" == "" ]]; then
+        if [[ "${SHORT}" == "true" ]] && [[ "${IS_NOT_USED_SHORT_PARAM}" == "1" ]]; then
             ARGS_SHORT+=("${PARAM_NAME_SHORT}")
             LINE=$(echo -n "-${PARAM_NAME_SHORT}, ${LINE}")
         fi
@@ -300,7 +307,7 @@ function printParameterDescriptionFlag() {
     local PARAM_NAME
     local PARAM_NAME_SHORT
     local DESCRIPTION
-    local IS_USED_SHORT_PARAM
+    local IS_NOT_USED_SHORT_PARAM
     local LINE
     local PARAMETER_DESCRIPTION_LINES=()
     for ARG in "$@"
@@ -309,9 +316,12 @@ function printParameterDescriptionFlag() {
         PARAM_NAME_SHORT=$(cut -c 1 <<<"${PARAM_NAME}")
         DESCRIPTION=$(parseValue "${1}" 2)
         [[ "${DESCRIPTION}" == "" ]] && { DESCRIPTION="Enable ${PARAM_NAME} flag."; }
-        IS_USED_SHORT_PARAM=$(grep "${PARAM_NAME_SHORT}" <<<$(echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"}) || true)
+        set +e
+        echo ${ARGS_SHORT[@]+"${ARGS_SHORT[@]}"} |grep "${PARAM_NAME_SHORT}"
+        IS_NOT_USED_SHORT_PARAM="$?"
+        set -e
         LINE=$(echo -n "--${PARAM_NAME}")
-        if [[ "${SHORT}" == "true" ]] && [[ "${IS_USED_SHORT_PARAM}" == "" ]]; then
+        if [[ "${SHORT}" == "true" ]] && [[ "${IS_NOT_USED_SHORT_PARAM}" == "1" ]]; then
             ARGS_SHORT+=("${PARAM_NAME_SHORT}")
             LINE=$(echo -n "-${PARAM_NAME_SHORT}, ${LINE}")
         fi
@@ -572,7 +582,7 @@ echo
 # Print parameter descriptions
 if [[ "${HAS_ENVIRONMENT}" == "true" ]]; then
     echo
-    echo "${BASE_INDENT}Environment variables: "
+    echo "${BASE_INDENT}Environment variables:"
     printEnvironmentVariableDescription "${ARGS_ENVIRONMENT[@]}"
 fi
 
@@ -620,8 +630,10 @@ printParseArgument ${ARGS_REQUIRED[@]+"${ARGS_REQUIRED[@]}"}
 printParseArgument ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"}
 printParseArgumentFlag ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
 
+# shellcheck disable=SC2016
 HELP_PARSER='    [[ "${ARG}" == "--help" ]] && { shift 1; HELP="true"; SHIFT="false"; }'
 if [[ ${HELP_SHORT_PARAM_ENABLE} == "true" ]]; then
+  # shellcheck disable=SC2016
   HELP_PARSER='    { [[ "${ARG}" == "--help" ]] || [[ "${ARG}" == "-h" ]]; } && { shift 1; HELP="true"; SHIFT="false"; }'
 fi
 echo "${HELP_PARSER}"
@@ -632,6 +644,7 @@ done
 __EOT__
 
 # Help mode
+# shellcheck disable=SC2016
 echo '[[ -n "${HELP+x}" ]] && { usage 0; }'
 
 [[ ${#ARGS_ENVIRONMENT[@]} -gt 0 ]] && { echo "# Check environment variables"; }
@@ -641,6 +654,7 @@ printCheckRequiredArgument ${ARGS_REQUIRED[@]+"${ARGS_REQUIRED[@]}"}
 
 # Check invalid state
 echo "# Check invalid state and display usage"
+# shellcheck disable=SC2016
 echo '[[ -n "${INVALID_STATE+x}" ]] && { usage; }'
 
 if [[ ${#ARGS_OPTIONAL[@]} -gt 0 ]] || [[ ${#ARGS_FLAG[@]} -gt 0 ]]; then
@@ -669,7 +683,7 @@ __EOT__
 
 
 if [[ ${#ARGS_ENVIRONMENT[@]} -gt 0 ]] || [[ ${#ARGS_REQUIRED[@]} -gt 0 ]] || [[ ${#ARGS_OPTIONAL[@]} -gt 0 ]] || [[ ${#ARGS_FLAG[@]} -gt 0 ]]; then
-    echo 'cat << __EOT__'
+    echo 'cat << _EOT_'
     echo ''
     REQUIRED_EOT="true"
 fi
@@ -684,7 +698,7 @@ if [[ ${#ARGS_OPTIONAL[@]} -gt 0 ]] || [[ ${#ARGS_FLAG[@]} -gt 0 ]]; then
     printVariableOptional ${ARGS_OPTIONAL[@]+"${ARGS_OPTIONAL[@]}"} ${ARGS_FLAG[@]+"${ARGS_FLAG[@]}"}
 fi
 
-[[ -n "${REQUIRED_EOT+x}" ]] && { echo '__EOT__'; }
+[[ -n "${REQUIRED_EOT+x}" ]] && { echo '_EOT_'; }
 
 
 # STARTER_URL=https://raw.githubusercontent.com/xshoji/bash-script-starter/master/ScriptStarter.sh
