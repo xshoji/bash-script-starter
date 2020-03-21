@@ -94,7 +94,6 @@ export USECOLOR="no"
 
 function main() {
   testCaseError
-  testCaseError
   testCaseOk
   testCaseRequiredParameterOnly
   testCaseRequiredAndEnvironmentParameter
