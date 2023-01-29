@@ -1,6 +1,6 @@
 # bash-script-starter
 
-ScriptStarter provides a means to generate a pretty template of bash script.
+ScriptStarter provides a means to generate a nice template of a bash script.
 
 <img src="https://i.imgur.com/5M0Udbv.gif" width="80%" height="80%" style="border:0;box-shadow:0 0 0 0; " alt="Demo">
 
