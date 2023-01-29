@@ -106,9 +106,9 @@ bash-4.2#
 
 ### Optional parameters
 
-Optional parameters are not validated.
+Optional parameters will be not validated.
 
-These optional parameters are initialized by default value.
+These optional parameters are initialised with a default value.
 
 ```
 bash-4.2# curl -sf ${STARTER_URL} |bash -s - -n MyScript -a xshoji -o id,1001 -o name,xshoji,"A user name.","guest" > MyScript
@@ -146,9 +146,9 @@ bash-4.2#
 
 ### Flags
 
-Flags are not validated.
+Flags will be not validated.
 
-These flags are set "true" string on enabling (default: empty string).
+These flags are set to "true" string when enabled  (default: empty string).
 
 ```
 bash-4.2# curl -sf ${STARTER_URL} |bash -s - -n MyScript -a xshoji -f strict -f dryRun > MyScript
@@ -186,7 +186,7 @@ bash-4.2#
 
 ### Environment variables
 
-You can check environment variables be should exported.
+You can check which environment variables be should be exported.
 
 Missing environment variables are displayed as `[!]`.
 
@@ -221,9 +221,9 @@ ENV_VAR_B: xshoji
 
 ### Support short name parameters
 
-You can specify each parameters as short name parameter.
+You can specify any parameters as a short name parameter.
 
-`-s, --short` option enables short parameter.
+The `-s, --short` option enables short parameters.
 
 ```
 bash-4.2# curl -sf ${STARTER_URL} |bash -s - -n MyScript -a xshoji -r id,1001 -o name,xshoji -f dryRun -s > MyScript
